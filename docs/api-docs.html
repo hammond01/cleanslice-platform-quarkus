@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>HONEY_BEE - API Documentation</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 40px; background: #f5f5f5; }
+        h1 { color: #333; }
+        .service-card { background: white; padding: 20px; margin: 15px 0; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .service-card h2 { color: #f59e0b; margin-top: 0; }
+        .links { display: flex; gap: 15px; margin-top: 10px; }
+        a { padding: 8px 16px; background: #3b82f6; color: white; text-decoration: none; border-radius: 4px; }
+        a:hover { background: #2563eb; }
+        .openapi { background: #10b981; }
+        .openapi:hover { background: #059669; }
+        .dev { background: #8b5cf6; }
+        .dev:hover { background: #7c3aed; }
+    </style>
+</head>
+<body>
+    <h1>🐝 HONEY_BEE - API Documentation</h1>
+    
+    <div class="service-card">
+        <h2>Product Service (Port 8012)</h2>
+        <div class="links">
+            <a href="http://localhost:8012/q/swagger-ui/" target="_blank">Swagger UI</a>
+            <a class="openapi" href="http://localhost:8012/q/openapi" target="_blank">OpenAPI Spec</a>
+            <a class="dev" href="http://localhost:8012/q/dev/" target="_blank">Dev UI</a>
+            <a href="http://localhost:8012/api/products" target="_blank">API Endpoint</a>
+        </div>
+    </div>
+
+    <div class="service-card">
+        <h2>Category Service (Port 8013)</h2>
+        <div class="links">
+            <a href="http://localhost:8013/q/swagger-ui/" target="_blank">Swagger UI</a>
+            <a class="openapi" href="http://localhost:8013/q/openapi" target="_blank">OpenAPI Spec</a>
+            <a class="dev" href="http://localhost:8013/q/dev/" target="_blank">Dev UI</a>
+            <a href="http://localhost:8013/api/categories" target="_blank">API Endpoint</a>
+        </div>
+    </div>
+
+    <div class="service-card">
+        <h2>Audit Service (Port 8011)</h2>
+        <div class="links">
+            <a href="http://localhost:8011/q/swagger-ui/" target="_blank">Swagger UI</a>
+            <a class="openapi" href="http://localhost:8011/q/openapi" target="_blank">OpenAPI Spec</a>
+            <a class="dev" href="http://localhost:8011/q/dev/" target="_blank">Dev UI</a>
+            <a href="http://localhost:8011/api/audit" target="_blank">API Endpoint</a>
+        </div>
+    </div>
+
+    <div class="service-card">
+        <h2>Kong Gateway (Port 8010)</h2>
+        <div class="links">
+            <a href="http://localhost:8010/api/products" target="_blank">Products (via Kong)</a>
+            <a href="http://localhost:8010/api/categories" target="_blank">Categories (via Kong)</a>
+            <a href="http://localhost:8010/api/audit" target="_blank">Audit (via Kong)</a>
+            <a class="dev" href="http://localhost:8001" target="_blank">Kong Admin API</a>
+        </div>
+    </div>
+
+    <div class="service-card">
+        <h2>Infrastructure</h2>
+        <div class="links">
+            <a class="dev" href="http://localhost:8090" target="_blank">Kafka UI</a>
+            <a class="dev" href="http://localhost:5432" target="_blank">PostgreSQL (5432)</a>
+        </div>
+    </div>
+</body>
+</html>

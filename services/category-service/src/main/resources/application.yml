@@ -1,0 +1,51 @@
+quarkus:
+  application:
+    name: category-service
+  http:
+    port: 8013
+  
+  datasource:
+    db-kind: postgresql
+    username: postgres
+    password: postgres
+    jdbc:
+      url: jdbc:postgresql://localhost:5432/category_db
+  
+  hibernate-orm:
+    database:
+      generation: update
+    log:
+      sql: true
+  
+  devservices:
+    enabled: false
+  
+  kafka:
+    devservices:
+      enabled: false
+  
+  swagger-ui:
+    always-include: true
+  
+  smallrye-openapi:
+    path: /openapi
+
+mp:
+  messaging:
+    connector:
+      smallrye-kafka:
+        bootstrap:
+          servers: localhost:29092
+    
+    outgoing:
+      audit-crud:
+        connector: smallrye-kafka
+        topic: audit.crud
+        value:
+          serializer: org.apache.kafka.common.serialization.StringSerializer
+      
+      audit-error:
+        connector: smallrye-kafka
+        topic: audit.error
+        value:
+          serializer: org.apache.kafka.common.serialization.StringSerializer

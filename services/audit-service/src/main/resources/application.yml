@@ -1,0 +1,105 @@
+quarkus:
+  application:
+    name: audit-service
+  http:
+    port: 8011
+  
+  datasource:
+    db-kind: postgresql
+    username: postgres
+    password: postgres
+    jdbc:
+      url: jdbc:postgresql://localhost:5432/audit_db
+  
+  hibernate-orm:
+    database:
+      generation: update
+    log:
+      sql: true
+  
+  devservices:
+    enabled: false
+  
+  kafka:
+    devservices:
+      enabled: false
+  
+  swagger-ui:
+    always-include: true
+  
+  smallrye-openapi:
+    path: /openapi
+
+mp:
+  messaging:
+    connector:
+      smallrye-kafka:
+        bootstrap:
+          servers: localhost:29092
+    
+    incoming:
+      login-events:
+        connector: smallrye-kafka
+        topic: audit.login
+        value:
+          deserializer: org.apache.kafka.common.serialization.StringDeserializer
+        group:
+          id: audit-service-login
+        auto:
+          offset:
+            reset: earliest
+      
+      crud-events:
+        connector: smallrye-kafka
+        topic: audit.crud
+        value:
+          deserializer: org.apache.kafka.common.serialization.StringDeserializer
+        group:
+          id: audit-service-crud
+        auto:
+          offset:
+            reset: earliest
+      
+      transaction-events:
+        connector: smallrye-kafka
+        topic: audit.transaction
+        value:
+          deserializer: org.apache.kafka.common.serialization.StringDeserializer
+        group:
+          id: audit-service-transaction
+        auto:
+          offset:
+            reset: earliest
+      
+      security-events:
+        connector: smallrye-kafka
+        topic: audit.security
+        value:
+          deserializer: org.apache.kafka.common.serialization.StringDeserializer
+        group:
+          id: audit-service-security
+        auto:
+          offset:
+            reset: earliest
+      
+      system-events:
+        connector: smallrye-kafka
+        topic: audit.system
+        value:
+          deserializer: org.apache.kafka.common.serialization.StringDeserializer
+        group:
+          id: audit-service-system
+        auto:
+          offset:
+            reset: earliest
+      
+      error-events:
+        connector: smallrye-kafka
+        topic: audit.error
+        value:
+          deserializer: org.apache.kafka.common.serialization.StringDeserializer
+        group:
+          id: audit-service-error
+        auto:
+          offset:
+            reset: earliest

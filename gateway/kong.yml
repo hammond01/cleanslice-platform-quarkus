@@ -1,0 +1,35 @@
+_format_version: "3.0"
+
+services:
+  - name: audit-service
+    url: http://host.docker.internal:8011
+    routes:
+      - name: audit-route
+        paths:
+          - /api/audit
+        strip_path: false
+        protocols:
+          - http
+          - https
+
+  - name: product-service
+    url: http://host.docker.internal:8012
+    routes:
+      - name: product-route
+        paths:
+          - /api/products
+        strip_path: false
+        protocols:
+          - http
+          - https
+
+  - name: category-service
+    url: http://host.docker.internal:8013
+    routes:
+      - name: category-route
+        paths:
+          - /api/categories
+        strip_path: false
+        protocols:
+          - http
+          - https
