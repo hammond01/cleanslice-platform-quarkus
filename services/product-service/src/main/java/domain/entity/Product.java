@@ -1,29 +1,35 @@
 package domain.entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Table;
+import domain.entity.base.BaseEntityWithNumber;
+import jakarta.persistence.*;
+import lombok.*;
 
 import java.math.BigDecimal;
 
 @Entity
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 @Table(name = "products")
-public class Product extends BaseEntity {
-    
+public class Product extends BaseEntityWithNumber {
+
+    // Getters and Setters
     @Column(nullable = false)
-    public String name;
-    
+    private String name;
+
     @Column(length = 1000)
-    public String description;
-    
+    private String description;
+
     @Column(nullable = false)
-    public BigDecimal price;
-    
+    private BigDecimal price;
+
     @Column(nullable = false)
-    public Integer stock;
-    
+    private Integer stock;
+
     @Column(name = "category_id")
-    public Long categoryId;
-    
-    public boolean active = true;
+    private Long categoryId;
+
+    private boolean active = true;
+
 }

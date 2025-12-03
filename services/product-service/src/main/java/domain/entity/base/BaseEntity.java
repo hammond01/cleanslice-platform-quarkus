@@ -1,11 +1,15 @@
-package domain.entity;
+package domain.entity.base;
 
 import infrastructure.persistence.AuditingEntityListener;
 import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
 import jakarta.persistence.*;
+import lombok.*;
+import share.ModificationStatus;
 
 import java.time.LocalDateTime;
 
+@Getter
+@Setter
 @MappedSuperclass
 @EntityListeners(AuditingEntityListener.class)
 public abstract class BaseEntity extends PanacheEntityBase {
@@ -52,13 +56,11 @@ public abstract class BaseEntity extends PanacheEntityBase {
         if (modificationStatus == null) {
             modificationStatus = ModificationStatus.ACTIVE;
         }
-        // createdBy will be set by AuditingEntityListener
     }
 
     @PreUpdate
     protected void onUpdate() {
         lastModifiedAt = LocalDateTime.now();
-        // lastModifiedBy will be set by AuditingEntityListener
     }
 
     public boolean isLocked() {
