@@ -3,7 +3,7 @@ package application.dto;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
-public class ProductResponse {
+public class GetProduct {
     public Long id;
     public String name;
     public String description;

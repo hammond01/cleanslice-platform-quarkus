@@ -1,8 +1,8 @@
 package application.dto;
 
-import domain.model.AuditStatus;
-import domain.model.AuditType;
-import domain.model.Severity;
+import domain.enums.AuditTypeEnum;
+import domain.enums.SeverityEnum;
+import share.enums.AuditStatusEnum;
 
 import java.time.LocalDateTime;
 
@@ -10,10 +10,10 @@ import java.time.LocalDateTime;
  * DTO for audit events sent via Kafka
  */
 public class AuditEvent {
-    public AuditType auditType;
+    public AuditTypeEnum auditTypeEnum;
     public String action;
     public String entityType;
-    public Long entityId;
+    public String entityId;
     public Long userId;
     public String username;
     public String serviceName;
@@ -24,10 +24,10 @@ public class AuditEvent {
     public String oldValue;
     public String newValue;
     public String metadata;
-    public AuditStatus status = AuditStatus.SUCCESS;
+    public AuditStatusEnum status = AuditStatusEnum.SUCCESS;
     public String errorMessage;
     public String stackTrace;
-    public Severity severity;
+    public SeverityEnum severityEnum;
     public LocalDateTime timestamp = LocalDateTime.now();
     public Long durationMs;
     public String correlationId;
@@ -36,8 +36,8 @@ public class AuditEvent {
     public static class Builder {
         private final AuditEvent event = new AuditEvent();
 
-        public Builder auditType(AuditType auditType) {
-            event.auditType = auditType;
+        public Builder auditType(AuditTypeEnum auditTypeEnum) {
+            event.auditTypeEnum = auditTypeEnum;
             return this;
         }
 
@@ -51,7 +51,7 @@ public class AuditEvent {
             return this;
         }
 
-        public Builder entityId(Long entityId) {
+        public Builder entityId(String entityId) {
             event.entityId = entityId;
             return this;
         }
@@ -71,7 +71,7 @@ public class AuditEvent {
             return this;
         }
 
-        public Builder status(AuditStatus status) {
+        public Builder status(AuditStatusEnum status) {
             event.status = status;
             return this;
         }
@@ -86,8 +86,8 @@ public class AuditEvent {
             return this;
         }
 
-        public Builder severity(Severity severity) {
-            event.severity = severity;
+        public Builder severity(SeverityEnum severityEnum) {
+            event.severityEnum = severityEnum;
             return this;
         }
 

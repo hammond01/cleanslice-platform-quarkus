@@ -1,6 +1,6 @@
 package infrastructure.persistence;
 
-import domain.entity.BaseEntity;
+import domain.entity.base.BaseEntity;
 import io.quarkus.arc.Arc;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
@@ -20,14 +20,14 @@ public class AuditingEntityListener {
     @PrePersist
     public void setCreatedBy(BaseEntity entity) {
         String currentUser = getCurrentUser();
-        if (entity.createdBy == null) {
-            entity.createdBy = currentUser;
+        if (entity.getCreatedBy() == null) {
+            entity.setCreatedBy(currentUser);
         }
     }
 
     @PreUpdate
     public void setLastModifiedBy(BaseEntity entity) {
-        entity.lastModifiedBy = getCurrentUser();
+        entity.setLastModifiedBy(getCurrentUser());
     }
 
     private String getCurrentUser() {
@@ -36,7 +36,7 @@ public class AuditingEntityListener {
             if (userContext != null) {
                 return userContext.getCurrentUserId();
             }
-            
+
             // Fallback to Arc container lookup
             UserContext ctx = Arc.container().instance(UserContext.class).get();
             if (ctx != null) {
@@ -45,7 +45,7 @@ public class AuditingEntityListener {
         } catch (Exception e) {
             // Ignore and return default
         }
-        
+
         return "system";
     }
 }
