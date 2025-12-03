@@ -1,4 +1,4 @@
-﻿package application.dto;
+package application.dto;
 
 public class UpdateCategoryDto {
     public String name;

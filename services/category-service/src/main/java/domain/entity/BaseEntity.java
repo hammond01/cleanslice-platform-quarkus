@@ -3,6 +3,8 @@ package domain.entity;
 import infrastructure.persistence.AuditingEntityListener;
 import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
 import jakarta.persistence.*;
+import share.ModificationStatus;
+
 import java.time.LocalDateTime;
 
 @MappedSuperclass

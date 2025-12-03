@@ -7,7 +7,7 @@ import application.dto.UpdateCategoryDto;
 import application.dto.AuditEvent;
 import application.port.outbound.AuditEventPublisherPort;
 import application.mapper.CategoryMapper;
-import domain.model.AuditType;
+import domain.enums.AuditType;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;

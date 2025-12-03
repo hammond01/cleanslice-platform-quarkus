@@ -1,8 +1,8 @@
 package application.dto;
 
-import domain.model.AuditStatus;
-import domain.model.AuditType;
-import domain.model.Severity;
+import domain.enums.AuditType;
+import domain.enums.Severity;
+import share.enums.AuditStatusEnum;
 
 import java.time.LocalDateTime;
 
@@ -21,7 +21,7 @@ public class AuditEvent {
     public String oldValue;
     public String newValue;
     public String metadata;
-    public AuditStatus status = AuditStatus.SUCCESS;
+    public AuditStatusEnum status = AuditStatusEnum.SUCCESS;
     public String errorMessage;
     public String stackTrace;
     public Severity severity;
@@ -68,7 +68,7 @@ public class AuditEvent {
             return this;
         }
 
-        public Builder status(AuditStatus status) {
+        public Builder status(AuditStatusEnum status) {
             event.status = status;
             return this;
         }
