@@ -34,8 +34,8 @@ public class QueryAuditLogsUseCase {
     }
 
     public List<AuditLog> getLogsByEntity(String entityType, Long entityId, int page, int size) {
-        return AuditLog.find("entityType = ?1 and entityId = ?2", 
-                Sort.descending("timestamp"), entityType, entityId)
+        return AuditLog.find("entityType = ?1 and entityId = ?2",
+                        Sort.descending("timestamp"), entityType, entityId)
                 .page(page, size)
                 .list();
     }
@@ -47,8 +47,8 @@ public class QueryAuditLogsUseCase {
     }
 
     public List<AuditLog> getLogsByDateRange(LocalDateTime from, LocalDateTime to, int page, int size) {
-        return AuditLog.find("timestamp >= ?1 and timestamp <= ?2", 
-                Sort.descending("timestamp"), from, to)
+        return AuditLog.find("timestamp >= ?1 and timestamp <= ?2",
+                        Sort.descending("timestamp"), from, to)
                 .page(page, size)
                 .list();
     }

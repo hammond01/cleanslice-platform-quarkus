@@ -17,7 +17,7 @@ import org.jboss.logging.Logger;
 public class ProcessAuditEventUseCase implements AuditEventConsumerPort {
 
     private static final Logger LOG = Logger.getLogger(ProcessAuditEventUseCase.class);
-    
+
     @Inject
     AuditMapper auditMapper;
 
@@ -25,11 +25,11 @@ public class ProcessAuditEventUseCase implements AuditEventConsumerPort {
     @Transactional
     public void processAuditEvent(AuditEvent event) {
         LOG.infof("Processing audit event: Type=%s, Action=%s", event.auditType, event.action);
-        
+
         AuditLog auditLog = auditMapper.toEntity(event);
         auditLog.persist();
-        
-        LOG.infof("Audit log persisted: ID=%d, Type=%s, Action=%s", 
+
+        LOG.infof("Audit log persisted: ID=%d, Type=%s, Action=%s",
                 auditLog.id, auditLog.auditType, auditLog.action);
     }
 }
