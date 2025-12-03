@@ -1,5 +1,6 @@
 package domain.entity;
 
+import domain.entity.base.BaseEntity;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 import jakarta.persistence.Column;

@@ -4,12 +4,20 @@ quarkus:
   http:
     port: 8013
   
+  # Logging configuration
+  log:
+    level: INFO
+    console:
+      enable: true
+      format: "%d{yyyy-MM-dd HH:mm:ss,SSS} %-5p [%c{3.}] (%t) %s%e%n"
+      level: INFO
+  
   datasource:
     db-kind: postgresql
     username: postgres
     password: postgres
-    jdbc:
-      url: jdbc:postgresql://localhost:5432/category_db
+    reactive:
+      url: postgresql://localhost:5432/category_db
   
   hibernate-orm:
     database:

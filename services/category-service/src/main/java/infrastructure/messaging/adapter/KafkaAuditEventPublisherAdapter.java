@@ -3,13 +3,13 @@ package infrastructure.messaging.adapter;
 import application.dto.AuditEvent;
 import application.port.outbound.AuditEventPublisherPort;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.quarkus.logging.Log;
 import io.smallrye.reactive.messaging.kafka.api.OutgoingKafkaRecordMetadata;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import org.eclipse.microprofile.reactive.messaging.Channel;
 import org.eclipse.microprofile.reactive.messaging.Emitter;
 import org.eclipse.microprofile.reactive.messaging.Message;
-import org.jboss.logging.Logger;
 
 /**
  * Kafka adapter for publishing audit events
@@ -17,8 +17,6 @@ import org.jboss.logging.Logger;
  */
 @ApplicationScoped
 public class KafkaAuditEventPublisherAdapter implements AuditEventPublisherPort {
-
-    private static final Logger LOG = Logger.getLogger(KafkaAuditEventPublisherAdapter.class);
 
     @Inject
     @Channel("audit-crud")
@@ -35,13 +33,17 @@ public class KafkaAuditEventPublisherAdapter implements AuditEventPublisherPort 
     public void publishCrudEvent(AuditEvent event) {
         try {
             String json = objectMapper.writeValueAsString(event);
+            String key = event.correlationId != null ? event.correlationId : String.valueOf(event.entityId);
+            
             crudEmitter.send(Message.of(json)
                 .addMetadata(OutgoingKafkaRecordMetadata.builder()
-                    .withKey(event.correlationId)
+                    .withKey(key)
                     .build()));
-            LOG.infof("Published CRUD audit event: %s", event.action);
+            
+            Log.infof("Published CRUD audit: action=%s, entity=%s, id=%s, correlation=%s", 
+                event.action, event.entityType, event.entityId, event.correlationId);
         } catch (Exception e) {
-            LOG.errorf(e, "Failed to publish CRUD audit event");
+            Log.errorf(e, "Failed to publish CRUD audit event for %s %s", event.entityType, event.entityId);
         }
     }
 
@@ -49,13 +51,16 @@ public class KafkaAuditEventPublisherAdapter implements AuditEventPublisherPort 
     public void publishErrorEvent(AuditEvent event) {
         try {
             String json = objectMapper.writeValueAsString(event);
+            String key = event.correlationId != null ? event.correlationId : "error";
+            
             errorEmitter.send(Message.of(json)
                 .addMetadata(OutgoingKafkaRecordMetadata.builder()
-                    .withKey(event.correlationId)
+                    .withKey(key)
                     .build()));
-            LOG.infof("Published ERROR audit event: %s", event.action);
+            
+            Log.infof("Published ERROR audit: action=%s, correlation=%s", event.action, event.correlationId);
         } catch (Exception e) {
-            LOG.errorf(e, "Failed to publish ERROR audit event");
+            Log.errorf(e, "Failed to publish ERROR audit event");
         }
     }
 }

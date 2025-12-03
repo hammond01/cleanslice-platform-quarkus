@@ -28,7 +28,7 @@ public interface CategoryMapper {
     @Mapping(target = "deletedBy", ignore = true)
     @Mapping(target = "rowVersion", ignore = true)
     @Mapping(target = "modificationStatus", ignore = true)
-    @Mapping(target = "active", constant = "true")
+    @Mapping(target = "active", ignore = true)
     Category toEntity(CreateCategoryDto dto);
     
     @Mapping(target = "id", ignore = true)

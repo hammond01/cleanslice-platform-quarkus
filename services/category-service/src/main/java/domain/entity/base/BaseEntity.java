@@ -1,7 +1,7 @@
-package domain.entity;
+package domain.entity.base;
 
 import infrastructure.persistence.AuditingEntityListener;
-import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
+import io.quarkus.hibernate.reactive.panache.PanacheEntityBase;
 import jakarta.persistence.*;
 import share.ModificationStatus;
 

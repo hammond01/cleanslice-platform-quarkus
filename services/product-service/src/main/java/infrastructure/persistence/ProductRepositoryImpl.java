@@ -2,6 +2,7 @@ package infrastructure.persistence;
 
 import application.port.outbound.ProductRepository;
 import domain.entity.Product;
+import io.smallrye.mutiny.Uni;
 import jakarta.enterprise.context.ApplicationScoped;
 
 import java.util.List;
@@ -10,22 +11,22 @@ import java.util.List;
 public class ProductRepositoryImpl implements ProductRepository {
 
     @Override
-    public void save(Product product) {
-        product.persist();
+    public Uni<Product> save(Product product) {
+        return product.persist().replaceWith(product);
     }
 
     @Override
-    public Product findById(String id) {
+    public Uni<Product> findById(String id) {
         return Product.findById(id);
     }
 
     @Override
-    public List<Product> findAll() {
+    public Uni<List<Product>> findAll() {
         return Product.listAll();
     }
 
     @Override
-    public void delete(Product product) {
-        product.delete();
+    public Uni<Void> delete(Product product) {
+        return product.delete().replaceWithVoid();
     }
 }

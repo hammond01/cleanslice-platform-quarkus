@@ -1,11 +1,11 @@
 package presentation.rest;
 
-import application.dto.GetCategoryDto;
-import application.dto.CreateCategoryDto;
-import application.dto.UpdateCategoryDto;
-import application.service.CategoryService;
+import application.dto.CreateProduct;
+import application.dto.GetProduct;
+import application.service.ProductService;
 import io.smallrye.mutiny.Uni;
 import jakarta.inject.Inject;
+import jakarta.validation.Valid;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MediaType;
@@ -15,31 +15,31 @@ import share.ApiResponse;
 import java.util.List;
 import java.util.UUID;
 
-@Path("/api/categories")
+@Path("/api/products")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
-public class CategoryController {
+public class ProductController {
 
     @Inject
-    CategoryService categoryService;
+    ProductService productService;
 
     @GET
-    public Uni<ApiResponse<List<GetCategoryDto>>> getAllCategories(@Context UriInfo uriInfo) {
+    public Uni<ApiResponse<List<GetProduct>>> getAllProducts(@Context UriInfo uriInfo) {
         String requestId = UUID.randomUUID().toString();
-        return categoryService.getAllCategories()
-                .onItem().transform(categories -> ApiResponse.ok(categories, requestId))
+        return productService.getAllProducts()
+                .onItem().transform(products -> ApiResponse.ok(products, requestId))
                 .onFailure().recoverWithItem(ex -> 
                         ApiResponse.fail("INTERNAL_ERROR", ex.getMessage(), requestId));
     }
 
     @GET
     @Path("/{id}")
-    public Uni<ApiResponse<GetCategoryDto>> getCategoryById(@PathParam("id") Long id, @Context UriInfo uriInfo) {
+    public Uni<ApiResponse<GetProduct>> getProductById(@PathParam("id") String id, @Context UriInfo uriInfo) {
         String requestId = UUID.randomUUID().toString();
-        return categoryService.getCategoryById(id)
-                .onItem().transform(category -> ApiResponse.ok(category, requestId))
+        return productService.getProductById(id)
+                .onItem().transform(product -> ApiResponse.ok(product, requestId))
                 .onFailure().recoverWithItem(ex -> {
-                    if (ex instanceof domain.exception.CategoryNotFoundException) {
+                    if (ex instanceof domain.exception.ProductNotFoundException) {
                         return ApiResponse.fail("NOT_FOUND", ex.getMessage(), requestId);
                     }
                     return ApiResponse.fail("INTERNAL_ERROR", ex.getMessage(), requestId);
@@ -47,22 +47,22 @@ public class CategoryController {
     }
 
     @POST
-    public Uni<ApiResponse<GetCategoryDto>> createCategory(CreateCategoryDto dto, @Context UriInfo uriInfo) {
+    public Uni<ApiResponse<GetProduct>> createProduct(@Valid CreateProduct request, @Context UriInfo uriInfo) {
         String requestId = UUID.randomUUID().toString();
-        return categoryService.createCategory(dto)
-                .onItem().transform(category -> ApiResponse.ok(category, requestId))
+        return productService.createProduct(request)
+                .onItem().transform(product -> ApiResponse.ok(product, requestId))
                 .onFailure().recoverWithItem(ex -> 
                         ApiResponse.fail("CREATION_FAILED", ex.getMessage(), requestId));
     }
 
     @PUT
     @Path("/{id}")
-    public Uni<ApiResponse<GetCategoryDto>> updateCategory(@PathParam("id") Long id, UpdateCategoryDto dto, @Context UriInfo uriInfo) {
+    public Uni<ApiResponse<GetProduct>> updateProduct(@PathParam("id") String id, @Valid CreateProduct request, @Context UriInfo uriInfo) {
         String requestId = UUID.randomUUID().toString();
-        return categoryService.updateCategory(id, dto)
-                .onItem().transform(category -> ApiResponse.ok(category, requestId))
+        return productService.updateProduct(id, request)
+                .onItem().transform(product -> ApiResponse.ok(product, requestId))
                 .onFailure().recoverWithItem(ex -> {
-                    if (ex instanceof domain.exception.CategoryNotFoundException) {
+                    if (ex instanceof domain.exception.ProductNotFoundException) {
                         return ApiResponse.fail("NOT_FOUND", ex.getMessage(), requestId);
                     }
                     return ApiResponse.fail("UPDATE_FAILED", ex.getMessage(), requestId);
@@ -71,12 +71,12 @@ public class CategoryController {
 
     @DELETE
     @Path("/{id}")
-    public Uni<ApiResponse<Void>> deleteCategory(@PathParam("id") Long id, @Context UriInfo uriInfo) {
+    public Uni<ApiResponse<Void>> deleteProduct(@PathParam("id") String id, @Context UriInfo uriInfo) {
         String requestId = UUID.randomUUID().toString();
-        return categoryService.deleteCategory(id)
+        return productService.deleteProduct(id)
                 .onItem().transform(v -> ApiResponse.ok(v, requestId))
                 .onFailure().recoverWithItem(ex -> {
-                    if (ex instanceof domain.exception.CategoryNotFoundException) {
+                    if (ex instanceof domain.exception.ProductNotFoundException) {
                         return ApiResponse.fail("NOT_FOUND", ex.getMessage(), requestId);
                     }
                     return ApiResponse.fail("DELETE_FAILED", ex.getMessage(), requestId);

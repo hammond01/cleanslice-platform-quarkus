@@ -1,15 +1,16 @@
 package application.port.outbound;
 
 import domain.entity.Product;
+import io.smallrye.mutiny.Uni;
 
 import java.util.List;
 
 public interface ProductRepository {
-    void save(Product product);
+    Uni<Product> save(Product product);
 
-    Product findById(String id);
+    Uni<Product> findById(String id);
 
-    List<Product> findAll();
+    Uni<List<Product>> findAll();
 
-    void delete(Product product);
+    Uni<Void> delete(Product product);
 }

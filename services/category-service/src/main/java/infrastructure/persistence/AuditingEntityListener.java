@@ -1,6 +1,6 @@
 package infrastructure.persistence;
 
-import domain.entity.BaseEntity;
+import domain.entity.base.BaseEntity;
 import io.quarkus.arc.Arc;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;

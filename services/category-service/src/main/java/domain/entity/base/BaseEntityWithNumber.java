@@ -1,9 +1,6 @@
-package domain.entity;
+package domain.entity.base;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.MappedSuperclass;
+import jakarta.persistence.*;
 import share.ModificationStatus;
 
 import java.time.LocalDateTime;

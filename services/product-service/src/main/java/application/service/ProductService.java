@@ -9,12 +9,16 @@ import application.port.outbound.ProductRepository;
 import domain.entity.Product;
 import domain.enums.AuditTypeEnum;
 import domain.exception.ProductNotFoundException;
+import infrastructure.persistence.UserContext;
+import io.quarkus.hibernate.reactive.panache.common.WithTransaction;
+import io.quarkus.logging.Log;
+import io.smallrye.mutiny.Uni;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
-import jakarta.transaction.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @ApplicationScoped
@@ -29,73 +33,116 @@ public class ProductService {
     @Inject
     ProductMapper productMapper;
 
-    public List<GetProduct> getAllProducts() {
-        return productRepository.findAll().stream()
-                .map(productMapper::toResponse)
-                .collect(Collectors.toList());
+    @Inject
+    UserContext userContext;
+
+    public Uni<List<GetProduct>> getAllProducts() {
+        return productRepository.findAll()
+                .onItem().transform(products -> products.stream()
+                        .map(productMapper::toResponse)
+                        .collect(Collectors.toList()))
+                .onFailure().invoke(ex -> 
+                        Log.errorf(ex, "Error getting all products: %s", ex.getMessage()));
     }
 
-    public GetProduct getProductById(String id) {
-        var product = productRepository.findById(id);
-
-        if (product == null) {
-            throw new ProductNotFoundException("Product not found with id: " + id);
-        }
-        return productMapper.toResponse(product);
+    public Uni<GetProduct> getProductById(String id) {
+        return productRepository.findById(id)
+                .onItem().ifNull().failWith(() -> new ProductNotFoundException("Product not found with id: " + id))
+                .onItem().transform(productMapper::toResponse);
     }
 
-    @Transactional
-    public GetProduct createProduct(CreateProduct request) {
+    @WithTransaction
+    public Uni<GetProduct> createProduct(CreateProduct request) {
         Product product = productMapper.toEntity(request);
 
-        productRepository.save(product);
-
-        publishCrudEvent("CREATE", product.getNumber(), "Created: " + product.getName());
-
-        return productMapper.toResponse(product);
+        return productRepository.save(product)
+                .onItem().invoke(savedProduct -> {
+                    try {
+                        publishCrudEvent("CREATE", savedProduct.getNumber(), "Created: " + savedProduct.getName());
+                    } catch (Exception ex) {
+                        Log.warnf(ex, "Failed to publish audit event for product creation: %s", ex.getMessage());
+                    }
+                })
+                .onItem().transform(productMapper::toResponse)
+                .onFailure().invoke(ex -> 
+                        Log.errorf(ex, "Error creating product: %s", ex.getMessage()));
     }
 
-    @Transactional
-    public GetProduct updateProduct(String number, CreateProduct request) {
-        var product = productRepository.findById(number);
-
-        if (product == null) {
-            throw new RuntimeException("Product not found");
-        }
-        productMapper.updateEntity(request, product);
-
-        // Publish audit event
-        publishCrudEvent("UPDATE", product.getNumber(), "Updated product: " + product.getName());
-
-        return productMapper.toResponse(product);
+    @WithTransaction
+    public Uni<GetProduct> updateProduct(String number, CreateProduct request) {
+        return productRepository.findById(number)
+                .onItem().ifNull().failWith(() -> new ProductNotFoundException("Product not found"))
+                .onItem().invoke(product -> productMapper.updateEntity(request, product))
+                .onItem().invoke(product -> {
+                    try {
+                        publishCrudEvent("UPDATE", product.getNumber(), "Updated product: " + product.getName());
+                    } catch (Exception ex) {
+                        Log.warnf(ex, "Failed to publish audit event for product update: %s", ex.getMessage());
+                    }
+                })
+                .onItem().transform(productMapper::toResponse)
+                .onFailure().invoke(ex -> 
+                        Log.errorf(ex, "Error updating product: %s", ex.getMessage()));
     }
 
-    @Transactional
-    public void deleteProduct(String number) {
-        var product = productRepository.findById(number);
-
-        if (product == null) {
-            throw new RuntimeException("Product not found");
-        }
-        String productName = product.getName();
-        productRepository.delete(product);
-        product.delete();
-
-        // Publish audit event
-        publishCrudEvent("DELETE", number, "Deleted product: " + productName);
+    @WithTransaction
+    public Uni<Void> deleteProduct(String number) {
+        return productRepository.findById(number)
+                .onItem().ifNull().failWith(() -> new ProductNotFoundException("Product not found"))
+                .onItem().transformToUni(product -> {
+                    String productName = product.getName();
+                    return productRepository.delete(product)
+                            .onItem().invoke(() -> {
+                                try {
+                                    publishCrudEvent("DELETE", number, "Deleted product: " + productName);
+                                } catch (Exception ex) {
+                                    Log.warnf(ex, "Failed to publish audit event for product deletion: %s", ex.getMessage());
+                                }
+                            });
+                })
+                .onFailure().invoke(ex -> 
+                        Log.errorf(ex, "Error deleting product: %s", ex.getMessage()));
     }
 
     private void publishCrudEvent(String action, String entityId, String details) {
-        var event = new AuditEvent();
+        publishCrudEvent(action, entityId, details, null);
+    }
 
-        event.auditTypeEnum = AuditTypeEnum.CRUD;
-        event.action = action;
-        event.serviceName = "product-service";
-        event.entityType = "Product";
-        event.entityId = entityId;
-        event.metadata = details;
-        event.timestamp = LocalDateTime.now();
+    private void publishCrudEvent(String action, String entityId, String details, String oldValue) {
+        try {
+            var event = new AuditEvent();
+            String correlationId = UUID.randomUUID().toString();
 
-        auditEventPublisher.publishCrudEvent(event);
+            event.auditTypeEnum = AuditTypeEnum.CRUD;
+            event.action = action;
+            event.serviceName = "product-service";
+            event.entityType = "Product";
+            event.entityId = entityId;
+            event.metadata = details;
+            event.timestamp = LocalDateTime.now();
+            event.correlationId = correlationId;
+            
+            // Add user context
+            try {
+                event.username = userContext.getUsername();
+                event.ipAddress = userContext.getIpAddress();
+                if (userContext.getCurrentUserId() != null && !"system".equals(userContext.getCurrentUserId())) {
+                    event.userId = Long.parseLong(userContext.getCurrentUserId());
+                }
+            } catch (Exception ex) {
+                Log.warnf("Failed to extract user context for audit: %s", ex.getMessage());
+            }
+            
+            // Add old/new values for UPDATE actions
+            if ("UPDATE".equals(action) && oldValue != null) {
+                event.oldValue = oldValue;
+                event.newValue = details;
+            }
+
+            auditEventPublisher.publishCrudEvent(event);
+            Log.debugf("Published audit event [%s] for %s: %s", correlationId, action, entityId);
+        } catch (Exception ex) {
+            Log.errorf(ex, "Critical: Failed to publish audit event for %s on %s", action, entityId);
+        }
     }
 }
