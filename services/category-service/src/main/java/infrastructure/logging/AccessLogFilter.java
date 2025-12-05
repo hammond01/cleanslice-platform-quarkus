@@ -51,14 +51,16 @@ public class AccessLogFilter implements ContainerRequestFilter, ContainerRespons
         
         // Get user info from headers (if authenticated)
         String userId = requestContext.getHeaderString("X-User-Id");
-        String username = requestContext.getHeaderString("X-Username");
+        // String username = requestContext.getHeaderString("X-Username");
         
         // Log access
         try {
             LoggingHelper logger = Arc.container().instance(LoggingHelper.class).get();
-            logger.logAccess(method, path, status, duration, userId);
+            if (logger != null) {
+                logger.logAccess(method, path, status, duration, userId);
+            }
         } catch (Exception e) {
-            Log.warn("Failed to log access", e);
+            Log.debugf("Could not log access (LoggingHelper not ready): %s", e.getMessage());
         }
         
         // Console log with emoji based on status

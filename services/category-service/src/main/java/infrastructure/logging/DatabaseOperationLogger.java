@@ -2,14 +2,8 @@ package infrastructure.logging;
 
 import io.quarkus.arc.Arc;
 import io.quarkus.logging.Log;
-import io.quarkus.hibernate.reactive.panache.common.WithSession;
 import io.smallrye.mutiny.Uni;
 import jakarta.enterprise.context.ApplicationScoped;
-import org.hibernate.reactive.mutiny.Mutiny;
-import share.dto.PerformanceLog;
-import share.enums.LogLevel;
-
-import java.time.LocalDateTime;
 
 /**
  * Hibernate interceptor for automatic database operation logging
@@ -18,7 +12,7 @@ import java.time.LocalDateTime;
 @ApplicationScoped
 public class DatabaseOperationLogger {
 
-    private static final ThreadLocal<Long> START_TIME = new ThreadLocal<>();
+    // private static final ThreadLocal<Long> START_TIME = new ThreadLocal<>();
     
     /**
      * Log database operation with automatic timing

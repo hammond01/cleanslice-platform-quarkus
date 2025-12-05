@@ -2,8 +2,6 @@ package infrastructure.logging;
 
 import io.quarkus.arc.Arc;
 import io.quarkus.logging.Log;
-import jakarta.ws.rs.container.ContainerRequestContext;
-import jakarta.ws.rs.container.ContainerResponseContext;
 import jakarta.ws.rs.ext.ExceptionMapper;
 import jakarta.ws.rs.ext.Provider;
 import jakarta.ws.rs.core.Response;
@@ -20,9 +18,11 @@ public class GlobalExceptionLogger implements ExceptionMapper<Exception> {
         // Log error automatically
         try {
             LoggingHelper logger = Arc.container().instance(LoggingHelper.class).get();
-            logger.logError(exception, null, null);
+            if (logger != null) {
+                logger.logError(exception, null, null);
+            }
         } catch (Exception e) {
-            Log.error("Failed to log exception", e);
+            Log.debugf("Could not log exception (LoggingHelper not ready): %s", e.getMessage());
         }
         
         // Log to console
