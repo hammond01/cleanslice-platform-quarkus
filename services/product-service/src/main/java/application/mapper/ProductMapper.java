@@ -14,9 +14,11 @@ import org.mapstruct.NullValuePropertyMappingStrategy;
 )
 public interface ProductMapper {
 
+    @Mapping(source = "RowId", target = "id")
     GetProduct toResponse(Product product);
 
-    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "RowId", ignore = true)
+    @Mapping(target = "Number", ignore = true)
     @Mapping(target = "createdAt", ignore = true)
     @Mapping(target = "createdBy", ignore = true)
     @Mapping(target = "lastModifiedAt", ignore = true)
@@ -27,11 +29,11 @@ public interface ProductMapper {
     @Mapping(target = "deletedBy", ignore = true)
     @Mapping(target = "rowVersion", ignore = true)
     @Mapping(target = "modificationStatus", ignore = true)
-    @Mapping(target = "number", ignore = true)
     @Mapping(target = "active", constant = "true")
     Product toEntity(CreateProduct request);
 
-    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "RowId", ignore = true)
+    @Mapping(target = "Number", ignore = true)
     @Mapping(target = "createdAt", ignore = true)
     @Mapping(target = "createdBy", ignore = true)
     @Mapping(target = "lastModifiedAt", ignore = true)
@@ -42,7 +44,6 @@ public interface ProductMapper {
     @Mapping(target = "deletedBy", ignore = true)
     @Mapping(target = "rowVersion", ignore = true)
     @Mapping(target = "modificationStatus", ignore = true)
-    @Mapping(target = "number", ignore = true)
     @Mapping(target = "active", ignore = true)
     void updateEntity(CreateProduct request, @MappingTarget Product product);
 }

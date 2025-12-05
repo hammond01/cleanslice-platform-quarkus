@@ -8,8 +8,9 @@ quarkus:
     db-kind: postgresql
     username: postgres
     password: postgres
-    jdbc:
-      url: jdbc:postgresql://localhost:5432/audit_db
+    reactive:
+      url: postgresql://localhost:5432/audit_db
+      max-size: 20
   
   hibernate-orm:
     database:

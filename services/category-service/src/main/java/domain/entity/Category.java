@@ -1,13 +1,11 @@
 package domain.entity;
 
-import domain.entity.base.BaseEntity;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Table;
-import jakarta.persistence.Column;
+import domain.entity.base.BaseEntityWithNumber;
+import jakarta.persistence.*;
 
 @Entity
 @Table(name = "categories")
-public class Category extends BaseEntity {
+public class Category extends BaseEntityWithNumber {
     
     @Column(nullable = false, unique = true)
     public String name;

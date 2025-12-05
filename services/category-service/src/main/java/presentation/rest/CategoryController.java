@@ -33,10 +33,10 @@ public class CategoryController {
     }
 
     @GET
-    @Path("/{id}")
-    public Uni<ApiResponse<GetCategoryDto>> getCategoryById(@PathParam("id") Long id, @Context UriInfo uriInfo) {
+    @Path("/{number}")
+    public Uni<ApiResponse<GetCategoryDto>> getCategoryById(@PathParam("number") String number, @Context UriInfo uriInfo) {
         String requestId = UUID.randomUUID().toString();
-        return categoryService.getCategoryById(id)
+        return categoryService.getCategoryById(number)
                 .onItem().transform(category -> ApiResponse.ok(category, requestId))
                 .onFailure().recoverWithItem(ex -> {
                     if (ex instanceof domain.exception.CategoryNotFoundException) {
@@ -56,10 +56,10 @@ public class CategoryController {
     }
 
     @PUT
-    @Path("/{id}")
-    public Uni<ApiResponse<GetCategoryDto>> updateCategory(@PathParam("id") Long id, UpdateCategoryDto dto, @Context UriInfo uriInfo) {
+    @Path("/{number}")
+    public Uni<ApiResponse<GetCategoryDto>> updateCategory(@PathParam("number") String number, UpdateCategoryDto dto, @Context UriInfo uriInfo) {
         String requestId = UUID.randomUUID().toString();
-        return categoryService.updateCategory(id, dto)
+        return categoryService.updateCategory(number, dto)
                 .onItem().transform(category -> ApiResponse.ok(category, requestId))
                 .onFailure().recoverWithItem(ex -> {
                     if (ex instanceof domain.exception.CategoryNotFoundException) {
@@ -70,10 +70,10 @@ public class CategoryController {
     }
 
     @DELETE
-    @Path("/{id}")
-    public Uni<ApiResponse<Void>> deleteCategory(@PathParam("id") Long id, @Context UriInfo uriInfo) {
+    @Path("/{number}")
+    public Uni<ApiResponse<Void>> deleteCategory(@PathParam("number") String number, @Context UriInfo uriInfo) {
         String requestId = UUID.randomUUID().toString();
-        return categoryService.deleteCategory(id)
+        return categoryService.deleteCategory(number)
                 .onItem().transform(v -> ApiResponse.ok(v, requestId))
                 .onFailure().recoverWithItem(ex -> {
                     if (ex instanceof domain.exception.CategoryNotFoundException) {

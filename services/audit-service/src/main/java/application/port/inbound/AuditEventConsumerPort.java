@@ -1,6 +1,7 @@
 package application.port.inbound;
 
 import application.dto.AuditEvent;
+import io.smallrye.mutiny.Uni;
 
 /**
  * Port for consuming audit events (Inbound port)
@@ -11,5 +12,5 @@ public interface AuditEventConsumerPort {
     /**
      * Process incoming audit event
      */
-    void processAuditEvent(AuditEvent event);
+    Uni<Void> processAuditEvent(AuditEvent event);
 }

@@ -15,9 +15,11 @@ import org.mapstruct.NullValuePropertyMappingStrategy;
 )
 public interface CategoryMapper {
     
+    @Mapping(source = "RowId", target = "id")
     GetCategoryDto toDto(Category category);
     
-    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "RowId", ignore = true)
+    @Mapping(target = "Number", ignore = true)
     @Mapping(target = "createdAt", ignore = true)
     @Mapping(target = "createdBy", ignore = true)
     @Mapping(target = "lastModifiedAt", ignore = true)
@@ -31,7 +33,8 @@ public interface CategoryMapper {
     @Mapping(target = "active", ignore = true)
     Category toEntity(CreateCategoryDto dto);
     
-    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "RowId", ignore = true)
+    @Mapping(target = "Number", ignore = true)
     @Mapping(target = "createdAt", ignore = true)
     @Mapping(target = "createdBy", ignore = true)
     @Mapping(target = "lastModifiedAt", ignore = true)

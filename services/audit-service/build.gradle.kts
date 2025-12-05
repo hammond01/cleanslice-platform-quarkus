@@ -27,17 +27,18 @@ tasks.withType<Test> {
 
 dependencies {
     implementation(enforcedPlatform("io.quarkus.platform:quarkus-bom:3.29.4"))
-    implementation("io.quarkus:quarkus-rest")
     implementation("io.quarkus:quarkus-rest-jackson")
-    implementation("io.quarkus:quarkus-hibernate-orm-panache")
-    implementation("io.quarkus:quarkus-jdbc-postgresql")
+    implementation("io.quarkus:quarkus-hibernate-reactive-panache")
+    implementation("io.quarkus:quarkus-reactive-pg-client")
     implementation("io.quarkus:quarkus-smallrye-health")
     implementation("io.quarkus:quarkus-smallrye-openapi")
     implementation("io.quarkus:quarkus-swagger-ui")
     implementation("io.quarkus:quarkus-arc")
-    //config yml file 
+    implementation("io.quarkus:quarkus-hibernate-validator")
+    //config yml file
     implementation("io.quarkus:quarkus-config-yaml")
-    // Kafka
+    
+    // Kafka for audit events
     implementation("io.quarkus:quarkus-messaging-kafka")
     
     // MapStruct
@@ -45,6 +46,7 @@ dependencies {
     annotationProcessor("org.mapstruct:mapstruct-processor:1.5.5.Final")
     
     implementation(project(":share"))
+    implementation(project(":core"))
     
     testImplementation("io.quarkus:quarkus-junit5")
     testImplementation("io.rest-assured:rest-assured")

@@ -64,7 +64,8 @@ public class KafkaAuditEventConsumerAdapter {
         try {
             LOG.infof("Received audit event from %s: %s", topic, message);
             AuditEvent event = objectMapper.readValue(message, AuditEvent.class);
-            processAuditEventUseCase.processAuditEvent(event);
+            processAuditEventUseCase.processAuditEvent(event)
+                .await().indefinitely();
         } catch (Exception e) {
             LOG.errorf(e, "Failed to process audit event from %s", topic);
         }

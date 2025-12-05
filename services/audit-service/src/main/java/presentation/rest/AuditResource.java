@@ -3,6 +3,7 @@ package presentation.rest;
 import domain.entity.AuditLog;
 import domain.entity.AuditType;
 import application.usecase.QueryAuditLogsUseCase;
+import io.smallrye.mutiny.Uni;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
@@ -21,7 +22,7 @@ public class AuditResource {
     QueryAuditLogsUseCase queryAuditLogsUseCase;
 
     @GET
-    public List<AuditLog> getAllLogs(
+    public Uni<List<AuditLog>> getAllLogs(
             @QueryParam("page") @DefaultValue("0") int page,
             @QueryParam("size") @DefaultValue("50") int size) {
         return queryAuditLogsUseCase.getAllLogs(page, size);
@@ -29,7 +30,7 @@ public class AuditResource {
 
     @GET
     @Path("/type/{type}")
-    public List<AuditLog> getLogsByType(
+    public Uni<List<AuditLog>> getLogsByType(
             @PathParam("type") AuditType type,
             @QueryParam("page") @DefaultValue("0") int page,
             @QueryParam("size") @DefaultValue("50") int size) {
@@ -38,7 +39,7 @@ public class AuditResource {
 
     @GET
     @Path("/user/{userId}")
-    public List<AuditLog> getLogsByUser(
+    public Uni<List<AuditLog>> getLogsByUser(
             @PathParam("userId") Long userId,
             @QueryParam("page") @DefaultValue("0") int page,
             @QueryParam("size") @DefaultValue("50") int size) {
@@ -47,7 +48,7 @@ public class AuditResource {
 
     @GET
     @Path("/entity/{entityType}/{entityId}")
-    public List<AuditLog> getLogsByEntity(
+    public Uni<List<AuditLog>> getLogsByEntity(
             @PathParam("entityType") String entityType,
             @PathParam("entityId") Long entityId,
             @QueryParam("page") @DefaultValue("0") int page,
@@ -57,7 +58,7 @@ public class AuditResource {
 
     @GET
     @Path("/service/{serviceName}")
-    public List<AuditLog> getLogsByService(
+    public Uni<List<AuditLog>> getLogsByService(
             @PathParam("serviceName") String serviceName,
             @QueryParam("page") @DefaultValue("0") int page,
             @QueryParam("size") @DefaultValue("50") int size) {
@@ -66,33 +67,33 @@ public class AuditResource {
 
     @GET
     @Path("/correlation/{correlationId}")
-    public List<AuditLog> getLogsByCorrelationId(@PathParam("correlationId") String correlationId) {
+    public Uni<List<AuditLog>> getLogsByCorrelationId(@PathParam("correlationId") String correlationId) {
         return queryAuditLogsUseCase.getLogsByCorrelationId(correlationId);
     }
 
     @GET
     @Path("/errors/recent")
-    public List<AuditLog> getRecentErrors(
+    public Uni<List<AuditLog>> getRecentErrors(
             @QueryParam("limit") @DefaultValue("20") int limit) {
         return queryAuditLogsUseCase.getRecentErrors(limit);
     }
 
     @GET
     @Path("/security/recent")
-    public List<AuditLog> getRecentSecurityEvents(
+    public Uni<List<AuditLog>> getRecentSecurityEvents(
             @QueryParam("limit") @DefaultValue("20") int limit) {
         return queryAuditLogsUseCase.getRecentSecurityEvents(limit);
     }
 
     @GET
     @Path("/stats/type/{type}")
-    public long countByType(@PathParam("type") AuditType type) {
+    public Uni<Long> countByType(@PathParam("type") AuditType type) {
         return queryAuditLogsUseCase.countByType(type);
     }
 
     @GET
     @Path("/stats/user/{userId}")
-    public long countByUser(@PathParam("userId") Long userId) {
+    public Uni<Long> countByUser(@PathParam("userId") Long userId) {
         return queryAuditLogsUseCase.countByUser(userId);
     }
 }

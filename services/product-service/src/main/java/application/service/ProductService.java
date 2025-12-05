@@ -41,7 +41,7 @@ public class ProductService {
                 .onItem().transform(products -> products.stream()
                         .map(productMapper::toResponse)
                         .collect(Collectors.toList()))
-                .onFailure().invoke(ex -> 
+                .onFailure().invoke(ex ->
                         Log.errorf(ex, "Error getting all products: %s", ex.getMessage()));
     }
 
@@ -58,13 +58,13 @@ public class ProductService {
         return productRepository.save(product)
                 .onItem().invoke(savedProduct -> {
                     try {
-                        publishCrudEvent("CREATE", savedProduct.number, "Created: " + savedProduct.name);
+                        publishCrudEvent("CREATE", savedProduct.RowId, "Created: " + savedProduct.name);
                     } catch (Exception ex) {
                         Log.warnf(ex, "Failed to publish audit event for product creation: %s", ex.getMessage());
                     }
                 })
                 .onItem().transform(productMapper::toResponse)
-                .onFailure().invoke(ex -> 
+                .onFailure().invoke(ex ->
                         Log.errorf(ex, "Error creating product: %s", ex.getMessage()));
     }
 
@@ -75,13 +75,13 @@ public class ProductService {
                 .onItem().invoke(product -> productMapper.updateEntity(request, product))
                 .onItem().invoke(product -> {
                     try {
-                        publishCrudEvent("UPDATE", product.number, "Updated product: " + product.name);
+                        publishCrudEvent("UPDATE", product.RowId, "Updated product: " + product.name);
                     } catch (Exception ex) {
                         Log.warnf(ex, "Failed to publish audit event for product update: %s", ex.getMessage());
                     }
                 })
                 .onItem().transform(productMapper::toResponse)
-                .onFailure().invoke(ex -> 
+                .onFailure().invoke(ex ->
                         Log.errorf(ex, "Error updating product: %s", ex.getMessage()));
     }
 
@@ -91,24 +91,25 @@ public class ProductService {
                 .onItem().ifNull().failWith(() -> new ProductNotFoundException("Product not found"))
                 .onItem().transformToUni(product -> {
                     String productName = product.name;
+                    Integer rowId = product.RowId;
                     return productRepository.delete(product)
                             .onItem().invoke(() -> {
                                 try {
-                                    publishCrudEvent("DELETE", number, "Deleted product: " + productName);
+                                    publishCrudEvent("DELETE", rowId, "Deleted product: " + productName);
                                 } catch (Exception ex) {
                                     Log.warnf(ex, "Failed to publish audit event for product deletion: %s", ex.getMessage());
                                 }
                             });
                 })
-                .onFailure().invoke(ex -> 
+                .onFailure().invoke(ex ->
                         Log.errorf(ex, "Error deleting product: %s", ex.getMessage()));
     }
 
-    private void publishCrudEvent(String action, String entityId, String details) {
-        publishCrudEvent(action, entityId, details, null);
+    private void publishCrudEvent(String action, Integer rowId, String details) {
+        publishCrudEvent(action, rowId, details, null);
     }
 
-    private void publishCrudEvent(String action, String entityId, String details, String oldValue) {
+    private void publishCrudEvent(String action, Integer rowId, String details, String oldValue) {
         try {
             var event = new AuditEvent();
             String correlationId = UUID.randomUUID().toString();
@@ -117,11 +118,11 @@ public class ProductService {
             event.action = action;
             event.serviceName = "product-service";
             event.entityType = "Product";
-            event.entityId = entityId;
+            event.rowId = rowId;
             event.metadata = details;
             event.timestamp = LocalDateTime.now();
             event.correlationId = correlationId;
-            
+
             // Add user context
             try {
                 event.username = userContext.getUsername();
@@ -132,7 +133,7 @@ public class ProductService {
             } catch (Exception ex) {
                 Log.warnf("Failed to extract user context for audit: %s", ex.getMessage());
             }
-            
+
             // Add old/new values for UPDATE actions
             if ("UPDATE".equals(action) && oldValue != null) {
                 event.oldValue = oldValue;
@@ -140,9 +141,9 @@ public class ProductService {
             }
 
             auditEventPublisher.publishCrudEvent(event);
-            Log.debugf("Published audit event [%s] for %s: %s", correlationId, action, entityId);
+            Log.debugf("Published audit event [%s] for %s: %s", correlationId, action, rowId);
         } catch (Exception ex) {
-            Log.errorf(ex, "Critical: Failed to publish audit event for %s on %s", action, entityId);
+            Log.errorf(ex, "Critical: Failed to publish audit event for %s on %s", action, rowId);
         }
     }
 }

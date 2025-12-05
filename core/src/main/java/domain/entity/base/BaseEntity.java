@@ -11,9 +11,8 @@ import java.time.LocalDateTime;
 @EntityListeners(AuditingEntityListener.class)
 public abstract class BaseEntity extends PanacheEntityBase {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    public Long id;
+    @Column(name = "row_id", insertable = false, updatable = false)
+    public Integer RowId;
 
     @Column(name = "created_at", nullable = false, updatable = false)
     public LocalDateTime createdAt;

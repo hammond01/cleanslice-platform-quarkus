@@ -2,6 +2,7 @@ package infrastructure.persistence;
 
 import application.port.outbound.CategoryRepository;
 import domain.entity.Category;
+import io.quarkus.hibernate.reactive.panache.common.WithSession;
 import io.smallrye.mutiny.Uni;
 import jakarta.enterprise.context.ApplicationScoped;
 
@@ -11,28 +12,32 @@ import java.util.List;
 public class CategoryRepositoryImpl implements CategoryRepository {
 
     @Override
+    @WithSession
     public Uni<List<Category>> findAll() {
         return Category.listAll();
     }
 
     @Override
-    public Uni<Category> findById(Long id) {
-        return Category.findById(id);
+    @WithSession
+    public Uni<Category> findById(String number) {
+        return Category.findById(number);
     }
 
     @Override
+    @WithSession
     public Uni<Category> save(Category category) {
         return category.persist().replaceWith(category);
     }
 
     @Override
-    public Uni<Void> deleteById(Long id) {
-        return Category.deleteById(id).replaceWithVoid();
+    @WithSession
+    public Uni<Void> deleteById(String number) {
+        return Category.deleteById(number).replaceWithVoid();
     }
 
     @Override
-    public Uni<Boolean> existsById(Long id) {
-        return Category.findById(id)
+    public Uni<Boolean> existsById(String number) {
+        return Category.findById(number)
                 .onItem().transform(c -> c != null);
     }
 }
