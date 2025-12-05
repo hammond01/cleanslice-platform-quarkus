@@ -2,6 +2,7 @@ package application.usecase;
 
 import application.mapper.ErrorLogMapper;
 import domain.entity.ErrorLog;
+import io.quarkus.hibernate.reactive.panache.common.WithTransaction;
 import io.quarkus.logging.Log;
 import io.smallrye.mutiny.Uni;
 import jakarta.enterprise.context.ApplicationScoped;
@@ -13,6 +14,7 @@ public class ProcessErrorLogUseCase {
     @Inject
     ErrorLogMapper mapper;
 
+    @WithTransaction
     public Uni<Void> process(share.dto.ErrorLog logDto) {
         ErrorLog log = mapper.toEntity(logDto);
         return log.persist()
