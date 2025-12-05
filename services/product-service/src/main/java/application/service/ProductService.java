@@ -8,6 +8,7 @@ import share.dto.AuditEvent;
 import share.enums.AuditTypeEnum;
 import domain.exception.ProductNotFoundException;
 import infrastructure.persistence.UserContext;
+import infrastructure.logging.DatabaseOperationLogger;
 import io.quarkus.hibernate.reactive.panache.common.WithTransaction;
 import io.quarkus.logging.Log;
 import io.smallrye.mutiny.Uni;
@@ -56,8 +57,11 @@ public class ProductService {
         // Todo: Generate unique Number for the product
         product.Number = "PRD-" + UUID.randomUUID().toString().substring(0, 8).toUpperCase();
 
-        return productRepository.save(product)
-                .call(savedProduct -> savedProduct.flush())
+        // Automatic DB operation logging with timing
+        return DatabaseOperationLogger.logPersist(product, 
+                productRepository.save(product)
+                    .call(savedProduct -> savedProduct.flush())
+                )
                 .onItem().invoke(savedProduct -> {
                     try {
                         Log.infof("Product saved with RowId: %s, Number: %s", savedProduct.RowId, savedProduct.Number);
