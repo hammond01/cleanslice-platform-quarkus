@@ -27,17 +27,18 @@ public class DatabaseOperationLogger {
                 // Get LoggingHelper from CDI
                 LoggingHelper logger = Arc.container().instance(LoggingHelper.class).get();
                 
-                // Log if slow (> 100ms for DB operations)
+                // Always log performance metrics
+                logger.logPerf(
+                    "DB:" + operation + ":" + entityName, 
+                    duration, 
+                    duration > 100  // Mark as slow if > 100ms
+                );
+                
                 if (duration > 100) {
-                    logger.logPerf(
-                        "DB:" + operation + ":" + entityName, 
-                        duration, 
-                        true
-                    );
-                    Log.warnf("🐌 Slow DB operation: %s %s took %dms", 
+                    Log.warnf("🐌 Slow DB operation: %s %s took %dms (sent to Kafka)", 
                         operation, entityName, duration);
                 } else {
-                    Log.debugf("⚡ DB operation: %s %s took %dms", 
+                    Log.debugf("⚡ DB operation: %s %s took %dms (sent to Kafka)", 
                         operation, entityName, duration);
                 }
             })

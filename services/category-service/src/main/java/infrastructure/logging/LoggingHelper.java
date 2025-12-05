@@ -103,12 +103,14 @@ public class LoggingHelper {
     private <T> void publishLog(Emitter<String> emitter, T log) {
         try {
             String json = objectMapper.writeValueAsString(log);
+            Log.debugf("📤 Publishing log to Kafka: %s", log.getClass().getSimpleName());
             emitter.send(Message.of(json)
                 .addMetadata(OutgoingKafkaRecordMetadata.<String>builder()
                     .withKey(UUID.randomUUID().toString())
                     .build()));
+            Log.debugf("✅ Successfully published %s to Kafka", log.getClass().getSimpleName());
         } catch (Exception e) {
-            Log.errorf(e, "Failed to publish log");
+            Log.errorf(e, "❌ Failed to publish %s to Kafka: %s", log.getClass().getSimpleName(), e.getMessage());
         }
     }
 

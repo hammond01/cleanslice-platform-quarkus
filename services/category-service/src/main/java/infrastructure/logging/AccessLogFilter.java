@@ -56,11 +56,10 @@ public class AccessLogFilter implements ContainerRequestFilter, ContainerRespons
         // Log access
         try {
             LoggingHelper logger = Arc.container().instance(LoggingHelper.class).get();
-            if (logger != null) {
-                logger.logAccess(method, path, status, duration, userId);
-            }
+            logger.logAccess(method, path, status, duration, userId);
+            Log.debugf("📤 Sent AccessLog to Kafka: %s %s - %d", method, path, status);
         } catch (Exception e) {
-            Log.debugf("Could not log access (LoggingHelper not ready): %s", e.getMessage());
+            Log.errorf(e, "❌ Failed to log access: %s", e.getMessage());
         }
         
         // Console log with emoji based on status
