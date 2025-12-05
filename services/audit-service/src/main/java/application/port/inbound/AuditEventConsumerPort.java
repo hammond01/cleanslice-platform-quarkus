@@ -1,6 +1,6 @@
 package application.port.inbound;
 
-import application.dto.AuditEvent;
+import share.dto.AuditEvent;
 import io.smallrye.mutiny.Uni;
 
 /**

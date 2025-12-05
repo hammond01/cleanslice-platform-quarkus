@@ -1,13 +1,11 @@
 package application.service;
 
-import application.dto.AuditEvent;
-import application.dto.CreateProduct;
-import application.dto.GetProduct;
+import application.dto.*;
 import application.mapper.ProductMapper;
-import application.port.outbound.AuditEventPublisherPort;
-import application.port.outbound.ProductRepository;
+import application.port.outbound.*;
 import domain.entity.Product;
-import domain.enums.AuditTypeEnum;
+import share.dto.AuditEvent;
+import share.enums.AuditTypeEnum;
 import domain.exception.ProductNotFoundException;
 import infrastructure.persistence.UserContext;
 import io.quarkus.hibernate.reactive.panache.common.WithTransaction;
@@ -54,10 +52,15 @@ public class ProductService {
     @WithTransaction
     public Uni<GetProduct> createProduct(CreateProduct request) {
         Product product = productMapper.toEntity(request);
+        
+        // Todo: Generate unique Number for the product
+        product.Number = "PRD-" + UUID.randomUUID().toString().substring(0, 8).toUpperCase();
 
         return productRepository.save(product)
+                .call(savedProduct -> savedProduct.flush())
                 .onItem().invoke(savedProduct -> {
                     try {
+                        Log.infof("Product saved with RowId: %s, Number: %s", savedProduct.RowId, savedProduct.Number);
                         publishCrudEvent("CREATE", savedProduct.RowId, "Created: " + savedProduct.name);
                     } catch (Exception ex) {
                         Log.warnf(ex, "Failed to publish audit event for product creation: %s", ex.getMessage());
@@ -141,7 +144,7 @@ public class ProductService {
             }
 
             auditEventPublisher.publishCrudEvent(event);
-            Log.debugf("Published audit event [%s] for %s: %s", correlationId, action, rowId);
+            Log.infof("Published audit event [%s] for %s: %s", correlationId, action, rowId);
         } catch (Exception ex) {
             Log.errorf(ex, "Critical: Failed to publish audit event for %s on %s", action, rowId);
         }

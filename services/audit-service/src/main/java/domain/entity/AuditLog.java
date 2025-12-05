@@ -3,6 +3,7 @@ package domain.entity;
 import io.quarkus.hibernate.reactive.panache.PanacheEntity;
 import jakarta.persistence.*;
 import share.enums.AuditStatusEnum;
+import share.enums.AuditTypeEnum;
 import share.enums.Severity;
 
 import java.time.LocalDateTime;
@@ -19,7 +20,7 @@ public class AuditLog extends PanacheEntity {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "audit_type", nullable = false, length = 50)
-    public AuditType auditType;
+    public AuditTypeEnum auditType;
 
     @Column(name = "action", nullable = false, length = 100)
     public String action;

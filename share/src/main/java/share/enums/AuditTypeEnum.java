@@ -1,4 +1,4 @@
-package domain.enums;
+package share.enums;
 
 public enum AuditTypeEnum {
     LOGIN,

@@ -1,6 +1,6 @@
 package application.port.outbound;
 
-import application.dto.AuditEvent;
+import share.dto.AuditEvent;
 
 /**
  * Port for publishing audit events (Outbound port)

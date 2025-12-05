@@ -1,6 +1,6 @@
 package infrastructure.messaging.adapter;
 
-import application.dto.AuditEvent;
+import share.dto.AuditEvent;
 import application.port.outbound.AuditEventPublisherPort;
 import com.fasterxml.jackson.databind.*;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;

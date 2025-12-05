@@ -1,12 +1,12 @@
 package presentation.rest;
 
 import domain.entity.AuditLog;
-import domain.entity.AuditType;
 import application.usecase.QueryAuditLogsUseCase;
 import io.smallrye.mutiny.Uni;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
+import share.enums.AuditTypeEnum;
 
 import java.util.List;
 
@@ -31,7 +31,7 @@ public class AuditResource {
     @GET
     @Path("/type/{type}")
     public Uni<List<AuditLog>> getLogsByType(
-            @PathParam("type") AuditType type,
+            @PathParam("type") AuditTypeEnum type,
             @QueryParam("page") @DefaultValue("0") int page,
             @QueryParam("size") @DefaultValue("50") int size) {
         return queryAuditLogsUseCase.getLogsByType(type, page, size);
@@ -87,7 +87,7 @@ public class AuditResource {
 
     @GET
     @Path("/stats/type/{type}")
-    public Uni<Long> countByType(@PathParam("type") AuditType type) {
+    public Uni<Long> countByType(@PathParam("type") AuditTypeEnum type) {
         return queryAuditLogsUseCase.countByType(type);
     }
 

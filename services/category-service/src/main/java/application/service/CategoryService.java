@@ -5,11 +5,10 @@ import domain.exception.CategoryNotFoundException;
 import application.dto.GetCategoryDto;
 import application.dto.CreateCategoryDto;
 import application.dto.UpdateCategoryDto;
-import application.dto.AuditEvent;
+import share.dto.AuditEvent;
 import application.port.outbound.AuditEventPublisherPort;
 import application.port.outbound.CategoryRepository;
 import application.mapper.CategoryMapper;
-import domain.enums.AuditType;
 import infrastructure.persistence.UserContext;
 import io.quarkus.hibernate.reactive.panache.common.WithTransaction;
 import io.quarkus.logging.Log;
@@ -17,6 +16,7 @@ import io.smallrye.mutiny.Uni;
 import io.smallrye.mutiny.unchecked.Unchecked;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
+import share.enums.AuditTypeEnum;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -62,12 +62,18 @@ public class CategoryService {
     @WithTransaction
     public Uni<GetCategoryDto> createCategory(CreateCategoryDto dto) {
         Category category = categoryMapper.toEntity(dto);
+        
+        // Todo: Generate unique Number for the category
+        category.Number = "CAT-" + UUID.randomUUID().toString().substring(0, 8).toUpperCase();
+        
         if (category.slug == null || category.slug.isEmpty()) {
             category.slug = generateSlug(dto.name);
         }
         return categoryRepository.save(category)
+                .call(savedCategory -> savedCategory.flush()) 
                 .onItem().invoke(savedCategory -> {
                     try {
+                        Log.infof("Category saved with RowId: %s, Number: %s", savedCategory.RowId, savedCategory.Number);
                         publishCrudEvent("CREATE", savedCategory.RowId, "Created category: " + savedCategory.name);
                     } catch (Exception ex) {
                         Log.warnf(ex, "Failed to publish audit event for category creation: %s", ex.getMessage());
@@ -137,7 +143,7 @@ public class CategoryService {
             AuditEvent event = new AuditEvent();
             String correlationId = UUID.randomUUID().toString();
 
-            event.auditType = AuditType.CRUD;
+            event.auditTypeEnum = AuditTypeEnum.CRUD;
             event.action = action;
             event.serviceName = "category-service";
             event.entityType = "Category";
