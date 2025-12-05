@@ -19,6 +19,14 @@ public class UserContext {
         return userId != null ? userId : "system";
     }
 
+    public String getUsername() {
+        return username;
+    }
+
+    public String getIpAddress() {
+        return ipAddress;
+    }
+
     public void setCurrentUser(String userId, String username) {
         this.userId = userId;
         this.username = username;
@@ -28,14 +36,6 @@ public class UserContext {
         this.userId = userId;
         this.username = username;
         this.ipAddress = ipAddress;
-    }
-
-    public String getUsername() {
-        return username;
-    }
-
-    public String getIpAddress() {
-        return ipAddress;
     }
 
     public void clear() {

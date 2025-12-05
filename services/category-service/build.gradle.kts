@@ -45,6 +45,7 @@ dependencies {
     annotationProcessor("org.mapstruct:mapstruct-processor:1.5.5.Final")
     
     implementation(project(":share"))
+    implementation(project(":core"))
     
     testImplementation("io.quarkus:quarkus-junit5")
     testImplementation("io.rest-assured:rest-assured")

@@ -1,6 +1,7 @@
 rootProject.name = "honey-bee"
 
 include(":share")
+include(":core")
 
 include(":services:product-service")
 include(":services:category-service")
