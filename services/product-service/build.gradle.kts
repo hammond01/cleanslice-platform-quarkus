@@ -35,8 +35,6 @@ dependencies {
     implementation("io.quarkus:quarkus-swagger-ui")
     implementation("io.quarkus:quarkus-arc")
     implementation("io.quarkus:quarkus-hibernate-validator")
-    compileOnly("org.projectlombok:lombok:1.18.32")
-    annotationProcessor("org.projectlombok:lombok:1.18.32")
     //config yml file
     implementation("io.quarkus:quarkus-config-yaml")
 
@@ -46,7 +44,6 @@ dependencies {
     // MapStruct
     implementation("org.mapstruct:mapstruct:1.5.5.Final")
     annotationProcessor("org.mapstruct:mapstruct-processor:1.5.5.Final")
-    annotationProcessor("org.projectlombok:lombok-mapstruct-binding:0.2.0")
 
     implementation(project(":share"))
 

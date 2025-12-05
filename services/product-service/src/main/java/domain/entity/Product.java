@@ -2,34 +2,29 @@ package domain.entity;
 
 import domain.entity.base.BaseEntityWithNumber;
 import jakarta.persistence.*;
-import lombok.*;
 
 import java.math.BigDecimal;
 
 @Entity
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
 @Table(name = "products")
 public class Product extends BaseEntityWithNumber {
 
     // Getters and Setters
     @Column(nullable = false)
-    private String name;
+    public String name;
 
     @Column(length = 1000)
-    private String description;
+    public String description;
 
     @Column(nullable = false)
-    private BigDecimal price;
+    public BigDecimal price;
 
     @Column(nullable = false)
-    private Integer stock;
+    public Integer stock;
 
     @Column(name = "category_id")
-    private Long categoryId;
+    public Long categoryId;
 
-    private boolean active = true;
+    public boolean active = true;
 
 }

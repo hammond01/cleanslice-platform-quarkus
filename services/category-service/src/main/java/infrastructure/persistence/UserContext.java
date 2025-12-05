@@ -2,20 +2,25 @@ package infrastructure.persistence;
 
 import io.quarkus.arc.Unremovable;
 import jakarta.enterprise.context.RequestScoped;
-import lombok.Getter;
 
 @RequestScoped
 @Unremovable
 public class UserContext {
 
     private String userId = "system";
-    @Getter
     private String username;
-    @Getter
     private String ipAddress;
 
     public String getCurrentUserId() {
         return userId != null ? userId : "system";
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public String getIpAddress() {
+        return ipAddress;
     }
 
     public void setCurrentUser(String userId, String username) {

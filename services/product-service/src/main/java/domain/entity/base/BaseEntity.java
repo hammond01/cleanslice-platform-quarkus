@@ -3,13 +3,10 @@ package domain.entity.base;
 import infrastructure.persistence.AuditingEntityListener;
 import io.quarkus.hibernate.reactive.panache.PanacheEntityBase;
 import jakarta.persistence.*;
-import lombok.*;
 import share.ModificationStatus;
 
 import java.time.LocalDateTime;
 
-@Getter
-@Setter
 @MappedSuperclass
 @EntityListeners(AuditingEntityListener.class)
 public abstract class BaseEntity extends PanacheEntityBase {

@@ -58,7 +58,7 @@ public class ProductService {
         return productRepository.save(product)
                 .onItem().invoke(savedProduct -> {
                     try {
-                        publishCrudEvent("CREATE", savedProduct.getNumber(), "Created: " + savedProduct.getName());
+                        publishCrudEvent("CREATE", savedProduct.number, "Created: " + savedProduct.name);
                     } catch (Exception ex) {
                         Log.warnf(ex, "Failed to publish audit event for product creation: %s", ex.getMessage());
                     }
@@ -75,7 +75,7 @@ public class ProductService {
                 .onItem().invoke(product -> productMapper.updateEntity(request, product))
                 .onItem().invoke(product -> {
                     try {
-                        publishCrudEvent("UPDATE", product.getNumber(), "Updated product: " + product.getName());
+                        publishCrudEvent("UPDATE", product.number, "Updated product: " + product.name);
                     } catch (Exception ex) {
                         Log.warnf(ex, "Failed to publish audit event for product update: %s", ex.getMessage());
                     }
@@ -90,7 +90,7 @@ public class ProductService {
         return productRepository.findById(number)
                 .onItem().ifNull().failWith(() -> new ProductNotFoundException("Product not found"))
                 .onItem().transformToUni(product -> {
-                    String productName = product.getName();
+                    String productName = product.name;
                     return productRepository.delete(product)
                             .onItem().invoke(() -> {
                                 try {

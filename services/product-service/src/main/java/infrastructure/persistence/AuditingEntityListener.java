@@ -20,14 +20,14 @@ public class AuditingEntityListener {
     @PrePersist
     public void setCreatedBy(BaseEntity entity) {
         String currentUser = getCurrentUser();
-        if (entity.getCreatedBy() == null) {
-            entity.setCreatedBy(currentUser);
+        if (entity.createdBy == null) {
+            entity.createdBy = currentUser;
         }
     }
 
     @PreUpdate
     public void setLastModifiedBy(BaseEntity entity) {
-        entity.setLastModifiedBy(getCurrentUser());
+        entity.lastModifiedBy = getCurrentUser();
     }
 
     private String getCurrentUser() {
