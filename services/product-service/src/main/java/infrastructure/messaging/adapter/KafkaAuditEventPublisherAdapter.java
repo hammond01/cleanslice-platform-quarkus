@@ -1,6 +1,6 @@
 package infrastructure.messaging.adapter;
 
-import application.dto.AuditEvent;
+import share.dto.AuditEvent;
 import application.port.outbound.AuditEventPublisherPort;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
@@ -56,9 +56,9 @@ public class KafkaAuditEventPublisherAdapter implements AuditEventPublisherPort 
                     .withKey(key)
                     .build()));
             
-            Log.debugf("Successfully sent CRUD audit [%s]: action=%s, entity=%s, rowId=%s, user=%s, terminal=%s",
+            Log.infof("✅ Successfully sent CRUD audit [%s]: action=%s, entity=%s, rowId=%s, user=%s",
                 event.correlationId, event.action, event.entityType, event.rowId, 
-                event.username, event.terminalId);
+                event.username);
             
         } catch (Exception e) {
             Log.errorf(e, "Failed to serialize/publish CRUD audit event for %s %s", 

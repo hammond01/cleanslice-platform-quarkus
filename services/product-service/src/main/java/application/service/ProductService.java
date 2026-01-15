@@ -1,15 +1,16 @@
 package application.service;
 
-import application.dto.AuditEvent;
-import application.dto.CreateProduct;
-import application.dto.GetProduct;
+import application.dto.*;
 import application.mapper.ProductMapper;
-import application.port.outbound.AuditEventPublisherPort;
-import application.port.outbound.ProductRepository;
+import application.port.outbound.*;
 import domain.entity.Product;
-import domain.enums.AuditTypeEnum;
+import share.dto.AuditEvent;
+import share.enums.AuditTypeEnum;
+import share.enums.LogLevel;
 import domain.exception.ProductNotFoundException;
 import infrastructure.persistence.UserContext;
+import infrastructure.logging.DatabaseOperationLogger;
+import infrastructure.logging.LoggingHelper;
 import io.quarkus.hibernate.reactive.panache.common.WithTransaction;
 import io.quarkus.logging.Log;
 import io.smallrye.mutiny.Uni;
@@ -36,6 +37,9 @@ public class ProductService {
     @Inject
     UserContext userContext;
 
+    @Inject
+    LoggingHelper loggingHelper;
+
     public Uni<List<GetProduct>> getAllProducts() {
         return productRepository.findAll()
                 .onItem().transform(products -> products.stream()
@@ -54,10 +58,35 @@ public class ProductService {
     @WithTransaction
     public Uni<GetProduct> createProduct(CreateProduct request) {
         Product product = productMapper.toEntity(request);
+        
+        // Todo: Generate unique Number for the product
+        product.Number = "PRD-" + UUID.randomUUID().toString().substring(0, 8).toUpperCase();
 
-        return productRepository.save(product)
+        // Manual application log for business event
+        loggingHelper.logApp(
+            LogLevel.INFO,
+            String.format("Starting creation of product: %s", request.name),
+            userContext.getCurrentUserId(),
+            null
+        );
+
+        // Automatic DB operation logging with timing
+        return DatabaseOperationLogger.logPersist(product, 
+                productRepository.save(product)
+                    .call(savedProduct -> savedProduct.flush())
+                )
                 .onItem().invoke(savedProduct -> {
                     try {
+                        Log.infof("Product saved with RowId: %s, Number: %s", savedProduct.RowId, savedProduct.Number);
+                        
+                        // Manual application log for successful creation
+                        loggingHelper.logApp(
+                            LogLevel.INFO,
+                            String.format("Product created successfully: %s (ID: %s)", savedProduct.name, savedProduct.RowId),
+                            userContext.getCurrentUserId(),
+                            null
+                        );
+                        
                         publishCrudEvent("CREATE", savedProduct.RowId, "Created: " + savedProduct.name);
                     } catch (Exception ex) {
                         Log.warnf(ex, "Failed to publish audit event for product creation: %s", ex.getMessage());
@@ -141,7 +170,7 @@ public class ProductService {
             }
 
             auditEventPublisher.publishCrudEvent(event);
-            Log.debugf("Published audit event [%s] for %s: %s", correlationId, action, rowId);
+            Log.infof("Published audit event [%s] for %s: %s", correlationId, action, rowId);
         } catch (Exception ex) {
             Log.errorf(ex, "Critical: Failed to publish audit event for %s on %s", action, rowId);
         }

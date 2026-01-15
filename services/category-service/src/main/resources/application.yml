@@ -57,3 +57,27 @@ mp:
         topic: audit.error
         value:
           serializer: org.apache.kafka.common.serialization.StringSerializer
+      
+      logs-application:
+        connector: smallrye-kafka
+        topic: logs.application
+        value:
+          serializer: org.apache.kafka.common.serialization.StringSerializer
+      
+      logs-error:
+        connector: smallrye-kafka
+        topic: logs.error
+        value:
+          serializer: org.apache.kafka.common.serialization.StringSerializer
+      
+      logs-access:
+        connector: smallrye-kafka
+        topic: logs.access
+        value:
+          serializer: org.apache.kafka.common.serialization.StringSerializer
+      
+      logs-performance:
+        connector: smallrye-kafka
+        topic: logs.performance
+        value:
+          serializer: org.apache.kafka.common.serialization.StringSerializer

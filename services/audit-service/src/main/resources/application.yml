@@ -104,3 +104,47 @@ mp:
         auto:
           offset:
             reset: earliest
+      
+      application-logs:
+        connector: smallrye-kafka
+        topic: logs.application
+        value:
+          deserializer: org.apache.kafka.common.serialization.StringDeserializer
+        group:
+          id: logging-service-application
+        auto:
+          offset:
+            reset: earliest
+      
+      error-logs:
+        connector: smallrye-kafka
+        topic: logs.error
+        value:
+          deserializer: org.apache.kafka.common.serialization.StringDeserializer
+        group:
+          id: logging-service-error
+        auto:
+          offset:
+            reset: earliest
+      
+      access-logs:
+        connector: smallrye-kafka
+        topic: logs.access
+        value:
+          deserializer: org.apache.kafka.common.serialization.StringDeserializer
+        group:
+          id: logging-service-access
+        auto:
+          offset:
+            reset: earliest
+      
+      performance-logs:
+        connector: smallrye-kafka
+        topic: logs.performance
+        value:
+          deserializer: org.apache.kafka.common.serialization.StringDeserializer
+        group:
+          id: logging-service-performance
+        auto:
+          offset:
+            reset: earliest

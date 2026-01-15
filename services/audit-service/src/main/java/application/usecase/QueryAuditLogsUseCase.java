@@ -1,7 +1,7 @@
 package application.usecase;
 
 import domain.entity.AuditLog;
-import domain.entity.AuditType;
+import share.enums.AuditTypeEnum;
 import io.quarkus.hibernate.reactive.panache.common.WithSession;
 import io.quarkus.panache.common.Sort;
 import io.smallrye.mutiny.Uni;
@@ -25,7 +25,7 @@ public class QueryAuditLogsUseCase {
     }
 
     @WithSession
-    public Uni<List<AuditLog>> getLogsByType(AuditType type, int page, int size) {
+    public Uni<List<AuditLog>> getLogsByType(AuditTypeEnum type, int page, int size) {
         return AuditLog.find("auditType = ?1", Sort.descending("timestamp"), type)
                 .page(page, size)
                 .list();
@@ -69,20 +69,20 @@ public class QueryAuditLogsUseCase {
 
     @WithSession
     public Uni<List<AuditLog>> getRecentErrors(int limit) {
-        return AuditLog.find("auditType = ?1", Sort.descending("timestamp"), AuditType.ERROR)
+        return AuditLog.find("auditType = ?1", Sort.descending("timestamp"), AuditTypeEnum.ERROR)
                 .page(0, limit)
                 .list();
     }
 
     @WithSession
     public Uni<List<AuditLog>> getRecentSecurityEvents(int limit) {
-        return AuditLog.find("auditType = ?1", Sort.descending("timestamp"), AuditType.SECURITY)
+        return AuditLog.find("auditType = ?1", Sort.descending("timestamp"), AuditTypeEnum.SECURITY)
                 .page(0, limit)
                 .list();
     }
 
     @WithSession
-    public Uni<Long> countByType(AuditType type) {
+    public Uni<Long> countByType(AuditTypeEnum type) {
         return AuditLog.count("auditType = ?1", type);
     }
 

@@ -1,15 +1,15 @@
 package application.service;
 
-import application.dto.AuditEvent;
+import share.dto.AuditEvent;
 import application.port.outbound.AuditEventPublisherPort;
-import domain.enums.AuditTypeEnum;
+import share.enums.AuditTypeEnum;
 import infrastructure.persistence.UserContext;
 import io.quarkus.logging.Log;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
-import share.context.PosContext;
 import share.enums.AuditStatusEnum;
 
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 /**
@@ -25,51 +25,31 @@ public class AuditHelper {
     @Inject
     UserContext userContext;
 
-    @Inject
-    PosContext posContext;
-
     /**
      * Create a base audit event with common fields populated
      */
-    public AuditEvent.Builder createBaseEvent(String serviceName, AuditTypeEnum auditType, String action) {
-        AuditEvent.Builder builder = AuditEvent.builder()
-                .auditType(auditType)
-                .action(action)
-                .serviceName(serviceName)
-                .correlationId(UUID.randomUUID().toString())
-                .status(AuditStatusEnum.SUCCESS);
+    public AuditEvent createBaseEvent(String serviceName, AuditTypeEnum auditType, String action) {
+        AuditEvent event = new AuditEvent();
+        event.auditTypeEnum = auditType;
+        event.action = action;
+        event.serviceName = serviceName;
+        event.timestamp = LocalDateTime.now();
+        event.correlationId = UUID.randomUUID().toString();
+        event.status = AuditStatusEnum.SUCCESS;
 
         // Add user context
         try {
-            builder.username(userContext.getUsername())
-                   .ipAddress(userContext.getIpAddress());
+            event.username = userContext.getUsername();
+            event.ipAddress = userContext.getIpAddress();
             
             if (userContext.getCurrentUserId() != null && !"system".equals(userContext.getCurrentUserId())) {
-                builder.userId(Long.parseLong(userContext.getCurrentUserId()));
+                event.userId = Long.parseLong(userContext.getCurrentUserId());
             }
         } catch (Exception ex) {
             Log.warnf("Failed to extract user context for audit: %s", ex.getMessage());
         }
 
-        // Add POS context
-        try {
-            if (posContext.getTerminalId() != null) {
-                builder.terminalId(posContext.getTerminalId());
-            }
-            if (posContext.getStoreId() != null) {
-                builder.storeId(posContext.getStoreId());
-            }
-            if (posContext.getShiftId() != null) {
-                builder.shiftId(posContext.getShiftId());
-            }
-            if (posContext.getPharmacistId() != null) {
-                builder.pharmacistId(posContext.getPharmacistId());
-            }
-        } catch (Exception ex) {
-            Log.warnf("Failed to extract POS context for audit: %s", ex.getMessage());
-        }
-
-        return builder;
+        return event;
     }
 
     /**

@@ -1,6 +1,6 @@
 package application.usecase;
 
-import application.dto.AuditEvent;
+import share.dto.AuditEvent;
 import application.port.inbound.AuditEventConsumerPort;
 import application.mapper.AuditMapper;
 import domain.entity.AuditLog;
@@ -25,7 +25,7 @@ public class ProcessAuditEventUseCase implements AuditEventConsumerPort {
     @Override
     @WithTransaction
     public Uni<Void> processAuditEvent(AuditEvent event) {
-        LOG.infof("Processing audit event: Type=%s, Action=%s", event.auditType, event.action);
+        LOG.infof("Processing audit event: Type=%s, Action=%s", event.auditTypeEnum, event.action);
 
         AuditLog auditLog = auditMapper.toEntity(event);
         return auditLog.persist()
