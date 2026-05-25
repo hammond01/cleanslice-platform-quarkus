@@ -1,55 +1,56 @@
 # CleanSlice Platform - Modular Monolith
 
-This project now runs as a single Quarkus modular monolith.
+This project runs as a single Quarkus modular monolith following **Clean Architecture (Hexagonal Architecture)** principles.
 
 ## Architecture
 
-- One deployable runtime: `app`
-- Internal modules (same process):
-  - `modules:product` (source at `services/product-service`)
-  - `modules:category` (source at `services/category-service`)
-  - `modules:audit` (source at `services/audit-service`)
-- Shared kernel:
-  - `core`
-  - `share`
+The project has been refactored from a multi-service setup into a highly cohesive, standard "Package by Layer" monolith under the `io.cleanslice.platform` package:
 
-The old microservice patterns (Kafka topics, saga orchestration, service-by-service runtime) were removed.
-Audit and logging flows are now in-process calls to the audit module.
+- `domain`: Core business logic and entities (independent of frameworks).
+- `port`: Interfaces for outbound communication (Repositories, External APIs).
+- `service`: Application layer containing use cases and business orchestration.
+- `controller`: Inbound primary adapters handling HTTP REST endpoints.
+- `infrastructure`: Outbound secondary adapters (Hibernate with Panache, DB connections).
+- `dto` & `mapper`: Data Transfer Objects and mapping logic to isolate domain models.
+- `common`: Cross-cutting concerns such as standardized Exceptions and Logging.
+
+The old microservice patterns (Kafka topics, saga orchestration, service-by-service runtime) were removed in favor of direct, in-process module communication.
 
 ## Run
 
 Prerequisites:
-
 - JDK 21+
-- Docker (for PostgreSQL only)
+- Docker or Podman (for PostgreSQL)
 
 Start database:
 
-```powershell
-docker-compose up -d
+```bash
+docker compose up -d
+# Or if using podman:
+podman compose up -d
 ```
 
-Run monolith:
+Run monolith in dev mode:
 
-```powershell
+```bash
 ./gradlew :app:quarkusDev
 ```
 
-Build:
+Build production jar:
 
-```powershell
+```bash
 ./gradlew :app:build
 ```
 
 ## Endpoints
 
-- Products: `http://localhost:8080/api/products`
-- Categories: `http://localhost:8080/api/categories`
-- Audit Logs: `http://localhost:8080/api/audit`
+- Products: `http://localhost:8080/api/v1/products`
+- Categories: `http://localhost:8080/api/v1/categories`
+- Audit Logs: `http://localhost:8080/api/v1/audit`
 - OpenAPI: `http://localhost:8080/q/openapi`
 - Swagger UI: `http://localhost:8080/q/swagger-ui`
 
 ## Notes
 
 - Runtime config is centralized in `app/src/main/resources/application.yml`.
-- Database config defaults to PostgreSQL at `localhost:5432`, database `product_db`, user/password `postgres/postgres`.
+- Database config defaults to PostgreSQL at `localhost:5432`, database `clean-architechture`, user/password `postgres/123456`.
