@@ -1,0 +1,86 @@
+package io.cleanslice.platform.controller;
+
+import io.cleanslice.platform.dto.CreateProductRequest;
+import io.cleanslice.platform.dto.ProductResponse;
+import io.cleanslice.platform.service.ProductService;
+import io.smallrye.mutiny.Uni;
+import jakarta.inject.Inject;
+import jakarta.validation.Valid;
+import jakarta.ws.rs.*;
+import jakarta.ws.rs.core.Context;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.UriInfo;
+import io.cleanslice.platform.common.response.ApiResponse;
+
+import java.util.List;
+import java.util.UUID;
+
+@Path("/api/products")
+@Produces(MediaType.APPLICATION_JSON)
+@Consumes(MediaType.APPLICATION_JSON)
+public class ProductResource {
+
+    @Inject
+    ProductService productService;
+
+    @GET
+    public Uni<ApiResponse<List<ProductResponse>>> getAllProducts(@Context UriInfo uriInfo) {
+        String requestId = UUID.randomUUID().toString();
+        return productService.getAllProducts()
+                .onItem().transform(products -> ApiResponse.ok(products, requestId))
+                .onFailure().recoverWithItem(ex -> 
+                        ApiResponse.fail("INTERNAL_ERROR", ex.getMessage(), requestId));
+    }
+
+    @GET
+    @Path("/{id}")
+    public Uni<ApiResponse<ProductResponse>> getProductById(@PathParam("id") String id, @Context UriInfo uriInfo) {
+        String requestId = UUID.randomUUID().toString();
+        return productService.getProductById(id)
+                .onItem().transform(product -> ApiResponse.ok(product, requestId))
+                .onFailure().recoverWithItem(ex -> {
+                    if (ex instanceof io.cleanslice.platform.common.exception.ResourceNotFoundException) {
+                        return ApiResponse.fail("NOT_FOUND", ex.getMessage(), requestId);
+                    }
+                    return ApiResponse.fail("INTERNAL_ERROR", ex.getMessage(), requestId);
+                });
+    }
+
+    @POST
+    public Uni<ApiResponse<ProductResponse>> createProduct(@Valid CreateProductRequest request, @Context UriInfo uriInfo) {
+        String requestId = UUID.randomUUID().toString();
+        return productService.createProduct(request)
+                .onItem().transform(product -> ApiResponse.ok(product, requestId))
+                .onFailure().recoverWithItem(ex -> 
+                        ApiResponse.fail("CREATION_FAILED", ex.getMessage(), requestId));
+    }
+
+    @PUT
+    @Path("/{id}")
+    public Uni<ApiResponse<ProductResponse>> updateProduct(@PathParam("id") String id, @Valid CreateProductRequest request, @Context UriInfo uriInfo) {
+        String requestId = UUID.randomUUID().toString();
+        return productService.updateProduct(id, request)
+                .onItem().transform(product -> ApiResponse.ok(product, requestId))
+                .onFailure().recoverWithItem(ex -> {
+                    if (ex instanceof io.cleanslice.platform.common.exception.ResourceNotFoundException) {
+                        return ApiResponse.fail("NOT_FOUND", ex.getMessage(), requestId);
+                    }
+                    return ApiResponse.fail("UPDATE_FAILED", ex.getMessage(), requestId);
+                });
+    }
+
+    @DELETE
+    @Path("/{id}")
+    public Uni<ApiResponse<Void>> deleteProduct(@PathParam("id") String id, @Context UriInfo uriInfo) {
+        String requestId = UUID.randomUUID().toString();
+        return productService.deleteProduct(id)
+                .onItem().transform(v -> ApiResponse.ok(v, requestId))
+                .onFailure().recoverWithItem(ex -> {
+                    if (ex instanceof io.cleanslice.platform.common.exception.ResourceNotFoundException) {
+                        return ApiResponse.fail("NOT_FOUND", ex.getMessage(), requestId);
+                    }
+                    return ApiResponse.fail("DELETE_FAILED", ex.getMessage(), requestId);
+                });
+    }
+}
+

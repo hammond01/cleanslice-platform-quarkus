@@ -1,0 +1,14 @@
+package io.cleanslice.platform.domain.enums;
+
+public enum AuditTypeEnum {
+    LOGIN,
+    CRUD,
+    TRANSACTION,
+    SECURITY,
+    SYSTEM,
+    ERROR,
+    API,
+    DATA_TRANSFER,
+    ADMIN
+}
+

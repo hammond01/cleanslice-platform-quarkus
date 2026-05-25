@@ -13,22 +13,26 @@ allprojects {
 }
 
 subprojects {
-    if (path.startsWith(":services:")) {
-        apply(plugin = "java")
-        apply(plugin = "io.quarkus")
-
+    plugins.withId("java") {
         configure<JavaPluginExtension> {
             sourceCompatibility = JavaVersion.VERSION_21
             targetCompatibility = JavaVersion.VERSION_21
         }
+    }
 
-        tasks.withType<JavaCompile> {
-            options.encoding = "UTF-8"
-            options.compilerArgs.add("-parameters")
+    plugins.withId("java-library") {
+        configure<JavaPluginExtension> {
+            sourceCompatibility = JavaVersion.VERSION_21
+            targetCompatibility = JavaVersion.VERSION_21
         }
+    }
 
-        tasks.withType<Test> {
-            systemProperty("java.util.logging.manager", "org.jboss.logmanager.LogManager")
-        }
+    tasks.withType<JavaCompile> {
+        options.encoding = "UTF-8"
+        options.compilerArgs.add("-parameters")
+    }
+
+    tasks.withType<Test> {
+        systemProperty("java.util.logging.manager", "org.jboss.logmanager.LogManager")
     }
 }
