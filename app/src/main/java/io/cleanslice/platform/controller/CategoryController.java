@@ -1,5 +1,6 @@
 package io.cleanslice.platform.controller;
 
+import io.cleanslice.platform.common.exception.ResourceNotFoundException;
 import io.cleanslice.platform.dto.GetCategoryDto;
 import io.cleanslice.platform.dto.CreateCategoryDto;
 import io.cleanslice.platform.dto.UpdateCategoryDto;
@@ -15,10 +16,10 @@ import io.cleanslice.platform.common.response.ApiResponse;
 import java.util.List;
 import java.util.UUID;
 
-@Path("/api/categories")
+@Path("/api/v1/categories")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
-public class CategoryResource {
+public class CategoryController {
 
     @Inject
     CategoryService categoryService;
@@ -28,21 +29,21 @@ public class CategoryResource {
         String requestId = UUID.randomUUID().toString();
         return categoryService.getAllCategories()
                 .onItem().transform(categories -> ApiResponse.ok(categories, requestId))
-                .onFailure().recoverWithItem(ex -> 
-                        ApiResponse.fail("INTERNAL_ERROR", ex.getMessage(), requestId));
+                .onFailure().recoverWithItem(ex -> ApiResponse.fail("INTERNAL_ERROR", "Unknown error", requestId));
     }
 
     @GET
     @Path("/{number}")
-    public Uni<ApiResponse<GetCategoryDto>> getCategoryById(@PathParam("number") String number, @Context UriInfo uriInfo) {
+    public Uni<ApiResponse<GetCategoryDto>> getCategoryById(@PathParam("number") String number,
+            @Context UriInfo uriInfo) {
         String requestId = UUID.randomUUID().toString();
         return categoryService.getCategoryById(number)
                 .onItem().transform(category -> ApiResponse.ok(category, requestId))
                 .onFailure().recoverWithItem(ex -> {
-                    if (ex instanceof io.cleanslice.platform.common.exception.ResourceNotFoundException) {
+                    if (ex instanceof ResourceNotFoundException) {
                         return ApiResponse.fail("NOT_FOUND", ex.getMessage(), requestId);
                     }
-                    return ApiResponse.fail("INTERNAL_ERROR", ex.getMessage(), requestId);
+                    return ApiResponse.fail("INTERNAL_ERROR", "Unknown error", requestId);
                 });
     }
 
@@ -51,21 +52,21 @@ public class CategoryResource {
         String requestId = UUID.randomUUID().toString();
         return categoryService.createCategory(dto)
                 .onItem().transform(category -> ApiResponse.ok(category, requestId))
-                .onFailure().recoverWithItem(ex -> 
-                        ApiResponse.fail("CREATION_FAILED", ex.getMessage(), requestId));
+                .onFailure().recoverWithItem(ex -> ApiResponse.fail("CREATION_FAILED", "Unknown error", requestId));
     }
 
     @PUT
     @Path("/{number}")
-    public Uni<ApiResponse<GetCategoryDto>> updateCategory(@PathParam("number") String number, UpdateCategoryDto dto, @Context UriInfo uriInfo) {
+    public Uni<ApiResponse<GetCategoryDto>> updateCategory(@PathParam("number") String number, UpdateCategoryDto dto,
+            @Context UriInfo uriInfo) {
         String requestId = UUID.randomUUID().toString();
         return categoryService.updateCategory(number, dto)
                 .onItem().transform(category -> ApiResponse.ok(category, requestId))
                 .onFailure().recoverWithItem(ex -> {
-                    if (ex instanceof io.cleanslice.platform.common.exception.ResourceNotFoundException) {
-                        return ApiResponse.fail("NOT_FOUND", ex.getMessage(), requestId);
+                    if (ex instanceof ResourceNotFoundException) {
+                        return ApiResponse.fail("NOT_FOUND", "Unknown error", requestId);
                     }
-                    return ApiResponse.fail("UPDATE_FAILED", ex.getMessage(), requestId);
+                    return ApiResponse.fail("UPDATE_FAILED", "Unknown error", requestId);
                 });
     }
 
@@ -76,11 +77,10 @@ public class CategoryResource {
         return categoryService.deleteCategory(number)
                 .onItem().transform(v -> ApiResponse.ok(v, requestId))
                 .onFailure().recoverWithItem(ex -> {
-                    if (ex instanceof io.cleanslice.platform.common.exception.ResourceNotFoundException) {
-                        return ApiResponse.fail("NOT_FOUND", ex.getMessage(), requestId);
+                    if (ex instanceof ResourceNotFoundException) {
+                        return ApiResponse.fail("NOT_FOUND", "Unknown error", requestId);
                     }
-                    return ApiResponse.fail("DELETE_FAILED", ex.getMessage(), requestId);
+                    return ApiResponse.fail("DELETE_FAILED", "Unknown error", requestId);
                 });
     }
 }
-

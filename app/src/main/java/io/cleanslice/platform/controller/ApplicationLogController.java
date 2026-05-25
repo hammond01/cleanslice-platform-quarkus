@@ -1,7 +1,8 @@
 package io.cleanslice.platform.controller;
 
-import io.cleanslice.platform.domain.ErrorLog;
-import io.cleanslice.platform.service.QueryErrorLogsUseCase;
+import io.cleanslice.platform.domain.ApplicationLog;
+import io.cleanslice.platform.service.QueryApplicationLogsUseCase;
+import io.cleanslice.platform.domain.enums.LogLevel;
 import io.smallrye.mutiny.Uni;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.*;
@@ -11,35 +12,35 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 /**
- * REST API for querying error logs
+ * REST API for querying application logs
  */
-@Path("/api/logs/error")
+@Path("/api/v1/logs/application")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
-public class ErrorLogResource {
+public class ApplicationLogController {
 
     @Inject
-    QueryErrorLogsUseCase queryUseCase;
+    QueryApplicationLogsUseCase queryUseCase;
 
     @GET
-    public Uni<List<ErrorLog>> getAllLogs(
+    public Uni<List<ApplicationLog>> getAllLogs(
             @QueryParam("page") @DefaultValue("0") int page,
             @QueryParam("size") @DefaultValue("50") int size) {
         return queryUseCase.getAllLogs(page, size);
     }
 
     @GET
-    @Path("/exception/{exceptionType}")
-    public Uni<List<ErrorLog>> getLogsByExceptionType(
-            @PathParam("exceptionType") String exceptionType,
+    @Path("/level/{level}")
+    public Uni<List<ApplicationLog>> getLogsByLevel(
+            @PathParam("level") LogLevel level,
             @QueryParam("page") @DefaultValue("0") int page,
             @QueryParam("size") @DefaultValue("50") int size) {
-        return queryUseCase.getLogsByExceptionType(exceptionType, page, size);
+        return queryUseCase.getLogsByLevel(level, page, size);
     }
 
     @GET
     @Path("/service/{serviceName}")
-    public Uni<List<ErrorLog>> getLogsByService(
+    public Uni<List<ApplicationLog>> getLogsByService(
             @PathParam("serviceName") String serviceName,
             @QueryParam("page") @DefaultValue("0") int page,
             @QueryParam("size") @DefaultValue("50") int size) {
@@ -48,7 +49,7 @@ public class ErrorLogResource {
 
     @GET
     @Path("/user/{userId}")
-    public Uni<List<ErrorLog>> getLogsByUser(
+    public Uni<List<ApplicationLog>> getLogsByUser(
             @PathParam("userId") String userId,
             @QueryParam("page") @DefaultValue("0") int page,
             @QueryParam("size") @DefaultValue("50") int size) {
@@ -56,31 +57,15 @@ public class ErrorLogResource {
     }
 
     @GET
-    @Path("/http-method/{httpMethod}")
-    public Uni<List<ErrorLog>> getLogsByHttpMethod(
-            @PathParam("httpMethod") String httpMethod,
-            @QueryParam("page") @DefaultValue("0") int page,
-            @QueryParam("size") @DefaultValue("50") int size) {
-        return queryUseCase.getLogsByHttpMethod(httpMethod, page, size);
-    }
-
-    @GET
     @Path("/correlation/{correlationId}")
-    public Uni<List<ErrorLog>> getLogsByCorrelationId(
+    public Uni<List<ApplicationLog>> getLogsByCorrelationId(
             @PathParam("correlationId") String correlationId) {
         return queryUseCase.getLogsByCorrelationId(correlationId);
     }
 
     @GET
-    @Path("/recent")
-    public Uni<List<ErrorLog>> getRecentErrors(
-            @QueryParam("limit") @DefaultValue("20") int limit) {
-        return queryUseCase.getRecentErrors(limit);
-    }
-
-    @GET
     @Path("/search")
-    public Uni<List<ErrorLog>> searchLogs(
+    public Uni<List<ApplicationLog>> searchLogs(
             @QueryParam("keyword") String keyword,
             @QueryParam("page") @DefaultValue("0") int page,
             @QueryParam("size") @DefaultValue("50") int size) {
@@ -89,7 +74,7 @@ public class ErrorLogResource {
 
     @GET
     @Path("/date-range")
-    public Uni<List<ErrorLog>> getLogsByDateRange(
+    public Uni<List<ApplicationLog>> getLogsByDateRange(
             @QueryParam("from") String from,
             @QueryParam("to") String to,
             @QueryParam("page") @DefaultValue("0") int page,
@@ -100,9 +85,9 @@ public class ErrorLogResource {
     }
 
     @GET
-    @Path("/stats/exception/{exceptionType}")
-    public Uni<Long> countByExceptionType(@PathParam("exceptionType") String exceptionType) {
-        return queryUseCase.countByExceptionType(exceptionType);
+    @Path("/stats/level/{level}")
+    public Uni<Long> countByLevel(@PathParam("level") LogLevel level) {
+        return queryUseCase.countByLevel(level);
     }
 
     @GET
@@ -110,10 +95,5 @@ public class ErrorLogResource {
     public Uni<Long> countByService(@PathParam("serviceName") String serviceName) {
         return queryUseCase.countByService(serviceName);
     }
-
-    @GET
-    @Path("/stats/http-method/{httpMethod}")
-    public Uni<Long> countByHttpMethod(@PathParam("httpMethod") String httpMethod) {
-        return queryUseCase.countByHttpMethod(httpMethod);
-    }
 }
+

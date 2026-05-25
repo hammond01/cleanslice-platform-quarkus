@@ -1,5 +1,6 @@
 package io.cleanslice.platform.controller;
 
+import io.cleanslice.platform.common.exception.ResourceNotFoundException;
 import io.cleanslice.platform.dto.CreateProductRequest;
 import io.cleanslice.platform.dto.ProductResponse;
 import io.cleanslice.platform.service.ProductService;
@@ -15,10 +16,10 @@ import io.cleanslice.platform.common.response.ApiResponse;
 import java.util.List;
 import java.util.UUID;
 
-@Path("/api/products")
+@Path("/api/v1/products")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
-public class ProductResource {
+public class ProductController {
 
     @Inject
     ProductService productService;
@@ -29,7 +30,7 @@ public class ProductResource {
         return productService.getAllProducts()
                 .onItem().transform(products -> ApiResponse.ok(products, requestId))
                 .onFailure().recoverWithItem(ex -> 
-                        ApiResponse.fail("INTERNAL_ERROR", ex.getMessage(), requestId));
+                        ApiResponse.fail("INTERNAL_ERROR", (ex != null ? ex.getMessage() : "Unknown error"), requestId));
     }
 
     @GET
@@ -39,10 +40,10 @@ public class ProductResource {
         return productService.getProductById(id)
                 .onItem().transform(product -> ApiResponse.ok(product, requestId))
                 .onFailure().recoverWithItem(ex -> {
-                    if (ex instanceof io.cleanslice.platform.common.exception.ResourceNotFoundException) {
+                    if (ex instanceof ResourceNotFoundException) {
                         return ApiResponse.fail("NOT_FOUND", ex.getMessage(), requestId);
                     }
-                    return ApiResponse.fail("INTERNAL_ERROR", ex.getMessage(), requestId);
+                    return ApiResponse.fail("INTERNAL_ERROR", "Unknown error", requestId);
                 });
     }
 
@@ -52,7 +53,7 @@ public class ProductResource {
         return productService.createProduct(request)
                 .onItem().transform(product -> ApiResponse.ok(product, requestId))
                 .onFailure().recoverWithItem(ex -> 
-                        ApiResponse.fail("CREATION_FAILED", ex.getMessage(), requestId));
+                        ApiResponse.fail("CREATION_FAILED", (ex != null ? ex.getMessage() : "Unknown error"), requestId));
     }
 
     @PUT
@@ -62,10 +63,10 @@ public class ProductResource {
         return productService.updateProduct(id, request)
                 .onItem().transform(product -> ApiResponse.ok(product, requestId))
                 .onFailure().recoverWithItem(ex -> {
-                    if (ex instanceof io.cleanslice.platform.common.exception.ResourceNotFoundException) {
+                    if (ex instanceof ResourceNotFoundException) {
                         return ApiResponse.fail("NOT_FOUND", ex.getMessage(), requestId);
                     }
-                    return ApiResponse.fail("UPDATE_FAILED", ex.getMessage(), requestId);
+                    return ApiResponse.fail("UPDATE_FAILED", "Unknown error", requestId);
                 });
     }
 
@@ -76,10 +77,10 @@ public class ProductResource {
         return productService.deleteProduct(id)
                 .onItem().transform(v -> ApiResponse.ok(v, requestId))
                 .onFailure().recoverWithItem(ex -> {
-                    if (ex instanceof io.cleanslice.platform.common.exception.ResourceNotFoundException) {
+                    if (ex instanceof ResourceNotFoundException) {
                         return ApiResponse.fail("NOT_FOUND", ex.getMessage(), requestId);
                     }
-                    return ApiResponse.fail("DELETE_FAILED", ex.getMessage(), requestId);
+                    return ApiResponse.fail("DELETE_FAILED", "Unknown error", requestId);
                 });
     }
 }

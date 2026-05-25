@@ -13,10 +13,10 @@ import java.util.List;
 /**
  * REST API for querying performance logs (DB operations, timing)
  */
-@Path("/api/logs/performance")
+@Path("/api/v1/logs/performance")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
-public class PerformanceLogResource {
+public class PerformanceLogController {
 
     @Inject
     QueryPerformanceLogsUseCase queryUseCase;

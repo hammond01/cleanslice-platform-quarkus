@@ -13,10 +13,10 @@ import java.util.List;
 /**
  * REST API for querying access logs (HTTP requests/responses)
  */
-@Path("/api/logs/access")
+@Path("/api/v1/logs/access")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
-public class AccessLogResource {
+public class AccessLogController {
 
     @Inject
     QueryAccessLogsUseCase queryUseCase;

@@ -13,10 +13,10 @@ import java.util.List;
 /**
  * REST API for querying audit logs
  */
-@Path("/api/audit")
+@Path("/api/v1/audit")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
-public class AuditResource {
+public class AuditController {
 
     @Inject
     QueryAuditLogsUseCase queryAuditLogsUseCase;
