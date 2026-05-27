@@ -1,4 +1,4 @@
-package io.cleanslice.platform.port;
+package io.cleanslice.platform.application.port.out.persistence;
 
 import io.cleanslice.platform.domain.Product;
 import io.smallrye.mutiny.Uni;

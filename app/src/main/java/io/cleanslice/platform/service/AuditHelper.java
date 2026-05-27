@@ -1,7 +1,7 @@
 package io.cleanslice.platform.service;
 
 import io.cleanslice.platform.dto.AuditEvent;
-import io.cleanslice.platform.port.AuditEventPublisherPort;
+import io.cleanslice.platform.application.port.out.messaging.AuditEventPublisherPort;
 import io.cleanslice.platform.domain.enums.AuditTypeEnum;
 import io.cleanslice.platform.common.context.UserContext;
 import io.quarkus.logging.Log;

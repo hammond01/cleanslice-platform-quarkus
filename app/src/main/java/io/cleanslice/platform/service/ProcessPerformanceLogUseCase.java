@@ -1,5 +1,5 @@
 package io.cleanslice.platform.service;
-import io.cleanslice.platform.port.PerformanceLogRepository;
+import io.cleanslice.platform.application.port.out.persistence.PerformanceLogRepository;
 
 import io.cleanslice.platform.mapper.PerformanceLogMapper;
 import io.cleanslice.platform.domain.PerformanceLog;

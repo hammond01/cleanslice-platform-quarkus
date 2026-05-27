@@ -1,6 +1,6 @@
 package io.cleanslice.platform.infrastructure.persistence.repository;
 
-import io.cleanslice.platform.port.CategoryRepository;
+import io.cleanslice.platform.application.port.out.persistence.CategoryRepository;
 import io.cleanslice.platform.domain.Category;
 import io.cleanslice.platform.infrastructure.persistence.entity.CategoryEntity;
 import io.cleanslice.platform.infrastructure.persistence.mapper.CategoryEntityMapper;

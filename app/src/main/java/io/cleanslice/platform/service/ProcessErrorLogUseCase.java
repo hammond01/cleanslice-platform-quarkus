@@ -1,5 +1,5 @@
 package io.cleanslice.platform.service;
-import io.cleanslice.platform.port.ErrorLogRepository;
+import io.cleanslice.platform.application.port.out.persistence.ErrorLogRepository;
 
 import io.cleanslice.platform.mapper.ErrorLogMapper;
 import io.cleanslice.platform.domain.ErrorLog;

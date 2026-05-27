@@ -1,8 +1,8 @@
 package io.cleanslice.platform.infrastructure.adapter;
 
 import io.cleanslice.platform.dto.AuditEvent;
-import io.cleanslice.platform.port.AuditEventConsumerPort;
-import io.cleanslice.platform.port.AuditEventPublisherPort;
+import io.cleanslice.platform.application.port.in.messaging.AuditEventConsumerPort;
+import io.cleanslice.platform.application.port.out.messaging.AuditEventPublisherPort;
 import io.quarkus.logging.Log;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;

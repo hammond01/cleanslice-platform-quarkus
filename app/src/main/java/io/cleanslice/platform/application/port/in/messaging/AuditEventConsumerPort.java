@@ -1,4 +1,4 @@
-package io.cleanslice.platform.port;
+package io.cleanslice.platform.application.port.in.messaging;
 
 import io.cleanslice.platform.dto.AuditEvent;
 import io.smallrye.mutiny.Uni;

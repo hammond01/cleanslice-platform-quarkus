@@ -1,6 +1,6 @@
 package io.cleanslice.platform.infrastructure.persistence.repository;
 
-import io.cleanslice.platform.port.ProductRepository;
+import io.cleanslice.platform.application.port.out.persistence.ProductRepository;
 import io.cleanslice.platform.domain.Product;
 import io.cleanslice.platform.infrastructure.persistence.entity.ProductEntity;
 import io.cleanslice.platform.infrastructure.persistence.mapper.ProductEntityMapper;

@@ -5,7 +5,7 @@ import io.cleanslice.platform.common.exception.ResourceNotFoundException;
 import io.cleanslice.platform.dto.GetCategoryDto;
 import io.cleanslice.platform.dto.CreateCategoryDto;
 import io.cleanslice.platform.dto.UpdateCategoryDto;
-import io.cleanslice.platform.port.CategoryRepository;
+import io.cleanslice.platform.application.port.out.persistence.CategoryRepository;
 import io.cleanslice.platform.domain.enums.AuditTypeEnum;
 import io.cleanslice.platform.mapper.CategoryMapper;
 import io.cleanslice.platform.dto.AuditEvent;

@@ -1,8 +1,8 @@
 package io.cleanslice.platform.service;
 
-import io.cleanslice.platform.port.AuditLogRepository;
+import io.cleanslice.platform.application.port.out.persistence.AuditLogRepository;
 import io.cleanslice.platform.dto.AuditEvent;
-import io.cleanslice.platform.port.AuditEventConsumerPort;
+import io.cleanslice.platform.application.port.in.messaging.AuditEventConsumerPort;
 import io.cleanslice.platform.mapper.AuditMapper;
 import io.cleanslice.platform.domain.AuditLog;
 import io.quarkus.hibernate.reactive.panache.common.WithTransaction;

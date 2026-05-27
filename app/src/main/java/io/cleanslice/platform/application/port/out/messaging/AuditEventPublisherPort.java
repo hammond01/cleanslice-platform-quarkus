@@ -1,4 +1,4 @@
-package io.cleanslice.platform.port;
+package io.cleanslice.platform.application.port.out.messaging;
 
 import io.cleanslice.platform.dto.AuditEvent;
 

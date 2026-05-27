@@ -8,9 +8,8 @@ import io.cleanslice.platform.domain.Product;
 import io.cleanslice.platform.common.exception.ResourceNotFoundException;
 import io.cleanslice.platform.dto.CreateProductRequest;
 import io.cleanslice.platform.dto.ProductResponse;
-import io.cleanslice.platform.port.ProductRepository;
+import io.cleanslice.platform.application.port.out.persistence.ProductRepository;
 import io.cleanslice.platform.domain.enums.AuditTypeEnum;
-import io.cleanslice.platform.infrastructure.persistence.DatabaseOperationLogger;
 import io.cleanslice.platform.domain.enums.LogLevel;
 import io.cleanslice.platform.common.logging.LoggingHelper;
 import io.cleanslice.platform.mapper.ProductMapper;
@@ -71,7 +70,7 @@ public class ProductService {
         );
 
         // Automatic DB operation logging with timing
-        return DatabaseOperationLogger.logPersist(product, productRepository.save(product))
+        return productRepository.save(product)
                 .onItem().invoke(savedProduct -> {
                     Log.infof("Product saved with RowId: %s, Number: %s", savedProduct.RowId, savedProduct.Number);
                     

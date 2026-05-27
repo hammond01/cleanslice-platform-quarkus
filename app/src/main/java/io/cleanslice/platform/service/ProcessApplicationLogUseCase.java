@@ -1,5 +1,5 @@
 package io.cleanslice.platform.service;
-import io.cleanslice.platform.port.ApplicationLogRepository;
+import io.cleanslice.platform.application.port.out.persistence.ApplicationLogRepository;
 
 import io.cleanslice.platform.mapper.ApplicationLogMapper;
 import io.cleanslice.platform.domain.ApplicationLog;
