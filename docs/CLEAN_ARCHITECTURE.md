@@ -1,135 +1,102 @@
-# Clean Architecture - Folder Structure
+# Clean Architecture Guide
 
-Dự án áp dụng **Clean Architecture** (Hexagonal Architecture) với cấu trúc thư mục rõ ràng theo các layer:
+This document defines the architecture contract of the current template.
 
-## 📁 Cấu trúc chung cho tất cả services
+## Objective
 
-```
-com.honeybee.<service>/
-├── application/           # Application Layer
-│   ├── dto/              # Data Transfer Objects (Request/Response)
-│   └── service/          # Application Services (Use Cases)
-│
-├── domain/               # Domain Layer (Core Business Logic)
-│   ├── entity/          # Domain Entities (JPA entities)
-│   ├── model/           # Domain Models (Value Objects, Enums)
-│   └── repository/      # Repository Interfaces (sẽ thêm khi cần)
-│
-├── infrastructure/       # Infrastructure Layer
-│   ├── persistence/     # Repository Implementations (sẽ thêm khi cần)
-│   └── messaging/       # Kafka Publishers/Consumers
-│
-└── presentation/         # Presentation Layer
-    ├── rest/            # REST Controllers
-    └── grpc/            # gRPC Services (sẽ thêm khi cần)
-```
+- Keep domain and use-case logic independent from transport and persistence frameworks.
+- Make dependencies explicit and testable.
+- Keep template scalable for multiple teams in one runtime.
 
-## 🏗️ Chi tiết từng layer
+## Package layout
 
-### 1️⃣ **Domain Layer** - Trung tâm nghiệp vụ
-- **entity/**: JPA entities kế thừa từ `PanacheEntity`
-  - `Product.java`, `Category.java`, `AuditLog.java`
-- **model/**: Enums và Value Objects
-  - `AuditType`, `AuditStatus`, `Severity`
-- **Không phụ thuộc** vào layer nào khác
-
-### 2️⃣ **Application Layer** - Use Cases
-- **dto/**: Request/Response objects cho API
-  - `ProductRequest`, `ProductResponse`
-  - `AuditEvent` (DTO cho Kafka)
-- **service/**: Business logic, orchestration
-  - `ProductService`, `CategoryService`, `AuditQueryService`
-- Phụ thuộc: `domain`
-
-### 3️⃣ **Infrastructure Layer** - Technical Capabilities
-- **messaging/**: Kafka integration
-  - `AuditEventPublisher` (Producer)
-  - `AuditEventConsumer` (Consumer)
-- **persistence/**: Repository implementations (khi cần)
-- Phụ thuộc: `domain`, `application`
-
-### 4️⃣ **Presentation Layer** - User Interface
-- **rest/**: JAX-RS REST endpoints
-  - `ProductResource`, `CategoryResource`, `AuditResource`
-- **grpc/**: gRPC services (dự định tương lai)
-- Phụ thuộc: `application`
-
-## 📦 Services hiện tại
-
-### Product Service (`services/product-service`)
-```
-domain/
-  entity/Product.java
-  model/AuditType.java, AuditStatus.java, Severity.java
-application/
-  dto/ProductRequest.java, ProductResponse.java, AuditEvent.java
-  service/ProductService.java
-infrastructure/
-  messaging/AuditEventPublisher.java
-presentation/
-  rest/ProductResource.java
+```text
+io.cleanslice.platform
+├── domain
+├── application
+│   └── port
+│       ├── in
+│       │   └── messaging
+│       └── out
+│           ├── messaging
+│           └── persistence
+├── service
+├── controller
+├── infrastructure
+│   ├── adapter
+│   ├── persistence
+│   │   ├── entity
+│   │   ├── mapper
+│   │   └── repository
+│   └── filter
+├── dto
+├── mapper
+└── common
 ```
 
-### Category Service (`services/category-service`)
-```
-domain/
-  entity/Category.java
-  model/AuditType.java, AuditStatus.java, Severity.java
-application/
-  dto/CategoryRequest.java, CategoryResponse.java, AuditEvent.java
-  service/CategoryService.java
-infrastructure/
-  messaging/AuditEventPublisher.java
-presentation/
-  rest/CategoryResource.java
+## Dependency direction
+
+```text
+controller -> service -> domain
+                |
+                -> application.port <- infrastructure
 ```
 
-### Audit Service (`services/audit-service`)
-```
-domain/
-  entity/AuditLog.java, AuditType.java, AuditStatus.java, Severity.java
-application/
-  dto/AuditEvent.java
-  service/AuditQueryService.java
-infrastructure/
-  messaging/AuditEventConsumer.java
-presentation/
-  rest/AuditResource.java
-```
+Rules:
 
-## 🎯 Lợi ích của cấu trúc này
+- `domain` never depends on `service`, `controller`, `infrastructure`.
+- `service` may depend on `domain`, `application.port`, `mapper`, `dto`, `common`.
+- `controller` may depend on `service`, `dto`, `common`.
+- `infrastructure` implements ports and can depend on framework components.
 
-✅ **Separation of Concerns**: Mỗi layer có trách nhiệm rõ ràng  
-✅ **Testability**: Dễ dàng test từng layer độc lập  
-✅ **Maintainability**: Code dễ bảo trì, mở rộng  
-✅ **Dependency Rule**: Dependencies chỉ đi từ ngoài vào trong  
-✅ **Domain-Centric**: Business logic không phụ thuộc framework  
+## Enforced architecture tests
 
-## 🔄 Dependency Flow
+`app/src/test/java/io/cleanslice/platform/architecture/ArchitectureRulesTest.java`
 
-```
-Presentation → Application → Domain
-     ↓              ↓
-Infrastructure ----→
-```
+Current enforced constraints:
 
-- **Domain** không phụ thuộc ai
-- **Application** chỉ phụ thuộc Domain
-- **Infrastructure** phụ thuộc Domain & Application
-- **Presentation** phụ thuộc Application
+- service must not depend on controller/infrastructure
+- controller must not depend on infrastructure/ports
+- domain must not depend on outer layers
+- outbound persistence ports must be interfaces
+- inbound/outbound messaging ports must be interfaces
 
-## 📝 Quy tắc phát triển
+## Port and adapter conventions
 
-1. **Domain entities** là PanacheEntity, chứa business rules
-2. **DTOs** trong `application/dto`, không dùng entities ở API
-3. **Services** trong `application/service`, orchestrate use cases
-4. **Controllers** trong `presentation/rest`, chỉ handle HTTP
-5. **Infrastructure** chứa technical implementations (Kafka, DB, etc.)
+- Outbound persistence port:
+  - `application.port.out.persistence.<Feature>Repository`
+- Outbound messaging port:
+  - `application.port.out.messaging.<Feature>PublisherPort`
+- Inbound messaging port:
+  - `application.port.in.messaging.<Feature>ConsumerPort`
+- Adapter implementation:
+  - `infrastructure.persistence.repository.<Feature>RepositoryAdapter`
+  - `infrastructure.adapter.<Feature>Adapter`
 
-## 🚀 Tương lai
+## Use case conventions
 
-- [ ] Thêm `domain/repository` interfaces
-- [ ] Implement `infrastructure/persistence` repositories
-- [ ] Thêm `presentation/grpc` khi cần gRPC
-- [ ] Thêm `application/usecase` cho complex workflows
-- [ ] Implement Auth Service với cấu trúc tương tự
+- Query use cases: `Query*UseCase`
+- Command/process use cases: `Process*UseCase`
+- Domain-facing orchestration: keep in `service`
+- HTTP contract composition: keep in `controller`
+
+## Adding a new feature module
+
+1. Add/extend domain model in `domain`.
+2. Define required outbound ports in `application.port.out.*`.
+3. Implement use-case logic in `service`.
+4. Implement adapters in `infrastructure`.
+5. Expose endpoint in `controller` if needed.
+6. Add unit tests and architecture-safe integration tests.
+
+## Anti-patterns to avoid
+
+- Injecting infrastructure adapters directly into services.
+- Putting framework-specific annotations or behavior in domain models.
+- Business branching in controllers.
+- Reusing DTO classes as persistence entities.
+
+## Template status
+
+- This repository is a modular monolith template, not a multi-deploy microservice setup.
+- Historical service labels used in logs are logical names, not deployment boundaries.
