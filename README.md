@@ -23,6 +23,7 @@
 - Testing
 - CLI Helpers
 - CI Pipeline
+- Collaboration Standards
 - Runtime Configuration
 - Migrations And Database
 - Extending The Template
@@ -223,6 +224,20 @@ Workflow: `.github/workflows/ci.yml`
 
 ---
 
+## Collaboration Standards
+
+- Code owners: `.github/CODEOWNERS`
+- Pull request template: `.github/pull_request_template.md`
+- Issue templates:
+  - `.github/ISSUE_TEMPLATE/bug_report.yml`
+  - `.github/ISSUE_TEMPLATE/feature_request.yml`
+- Contribution guide: `CONTRIBUTING.md`
+- Security policy: `SECURITY.md`
+
+`main` is expected to be protected and merged via PR only.
+
+---
+
 ## Runtime Configuration
 
 Main config: `app/src/main/resources/application.yml`
@@ -274,4 +289,6 @@ Detailed checklist: `docs/TEMPLATE_CUSTOMIZATION.md`
 - `docs/TEMPLATE_CLI.md`
 - `docs/TEMPLATE_CUSTOMIZATION.md`
 - `docs/RELEASE_WORKFLOW.md`
+- `CONTRIBUTING.md`
+- `SECURITY.md`
 - `CHANGELOG.md`

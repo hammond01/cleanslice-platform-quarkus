@@ -1,0 +1,6 @@
+# Default owners for all files in this repository.
+* @hammond01
+
+# Optional domain ownership examples (adjust as team grows):
+# /app/src/main/java/io/cleanslice/platform/domain/ @team-domain
+# /app/src/main/java/io/cleanslice/platform/infrastructure/ @team-platform

@@ -11,7 +11,7 @@ repositories {
 }
 
 group = "io.cleanslice"
-version = "1.0.0-SNAPSHOT"
+version = "1.0.0"
 
 java {
     sourceCompatibility = JavaVersion.VERSION_21
@@ -74,6 +74,3 @@ dependencies {
     testImplementation("org.mockito:mockito-junit-jupiter:5.12.0")
     testImplementation("com.tngtech.archunit:archunit-junit5:1.3.0")
 }
-
-
-

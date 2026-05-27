@@ -6,6 +6,8 @@ The format is based on Keep a Changelog and follows Semantic Versioning.
 
 ## [Unreleased]
 
+## [1.0.0] - 2026-05-27
+
 ### Added
 
 - Template CLI helpers (`tools/template.ps1`, `tools/template.sh`) for local bootstrap and daily workflows.
@@ -31,6 +33,15 @@ The format is based on Keep a Changelog and follows Semantic Versioning.
   - `docs/TEMPLATE_CUSTOMIZATION.md`
   - `docs/RELEASE_WORKFLOW.md`
   - `CHANGELOG.md`
+- Collaboration and governance templates:
+  - `.github/CODEOWNERS`
+  - `.github/pull_request_template.md`
+  - `.github/ISSUE_TEMPLATE/bug_report.yml`
+  - `.github/ISSUE_TEMPLATE/feature_request.yml`
+  - `.github/ISSUE_TEMPLATE/config.yml`
+- Contributor and security guides:
+  - `CONTRIBUTING.md`
+  - `SECURITY.md`
 
 ### Changed
 

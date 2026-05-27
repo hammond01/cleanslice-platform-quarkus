@@ -1,0 +1,36 @@
+name: Feature request
+description: Propose an enhancement for the template.
+title: "[Feature] "
+labels:
+  - enhancement
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem statement
+      description: What problem should this solve for template users?
+      placeholder: As a template adopter, I need ...
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed solution
+      description: Suggested implementation and affected layers.
+      placeholder: application.port + service + infrastructure adapter + docs
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+      description: Other approaches and why they are weaker.
+  - type: checkboxes
+    id: impact
+    attributes:
+      label: Potential impact
+      options:
+        - label: Architecture rules impacted
+        - label: DB schema/migration impacted
+        - label: API contract impacted
+        - label: CI/pipeline impacted
