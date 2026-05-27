@@ -1,27 +1,92 @@
-# CleanSlice Platform Template (Quarkus + Clean Architecture)
+# Clean Architecture Modular Monolith Template for Quarkus 3
 
-Production-oriented template for building a reactive modular monolith on Quarkus with clear Clean/Hexagonal boundaries.
+> A production-minded Clean Architecture starter kit for Java 21 + Quarkus 3 with modular monolith boundaries, reactive persistence, migration tooling, structured logging/auditing, and CLI helpers for fast onboarding.
 
-## Why this template
+![Java 21](https://img.shields.io/badge/Java-21-007396?style=for-the-badge&logo=openjdk&logoColor=white)
+![Quarkus 3.29.4](https://img.shields.io/badge/Quarkus-3.29.4-4695EB?style=for-the-badge&logo=quarkus&logoColor=white)
+![Architecture](https://img.shields.io/badge/Architecture-Clean%20%2B%20Modular%20Monolith-2EA043?style=for-the-badge)
+![Reactive](https://img.shields.io/badge/Reactive-Mutiny%20%2B%20Hibernate%20Reactive-8A2BE2?style=for-the-badge)
+![Status](https://img.shields.io/badge/status-template%20starter%20kit-0366D6?style=for-the-badge)
+![CI](https://img.shields.io/badge/ci--tests-passing-238636?style=for-the-badge)
+![License](https://img.shields.io/badge/license-not%20set-6e7781?style=for-the-badge)
 
-- Single runtime, modular boundaries.
-- Clean Architecture package rules enforced by tests.
-- Reactive first (`Uni<T>`, Hibernate Reactive, reactive PostgreSQL client).
-- Flyway migration baseline included.
-- CI split for fast unit checks and DB-backed integration checks.
-- Structured logging and audit pipeline ready out of the box.
+---
 
-## Tech stack
+## Table Of Contents
 
-- Java 21
-- Quarkus 3.29.4
-- Hibernate Reactive Panache
-- Reactive PostgreSQL client
-- Flyway
-- MapStruct
-- JUnit 5 + Mockito + ArchUnit + RestAssured
+- What This Project Is
+- Current State
+- Architecture Overview
+- Project Structure
+- API Surface
+- Quick Start
+- Testing
+- CLI Helpers
+- CI Pipeline
+- Runtime Configuration
+- Migrations And Database
+- Extending The Template
+- Documentation Index
 
-## Project layout
+---
+
+## What This Project Is
+
+This repository is a Clean Architecture modular monolith template for Quarkus.
+
+It is designed for:
+
+- teams bootstrapping a new backend with strong architectural boundaries
+- developers who want reactive-first defaults
+- projects that prefer modular monolith simplicity before distributed complexity
+- learning and portfolio use cases where structure and maintainability matter
+
+### What this project is not
+
+This project is not:
+
+- a fully-featured business product
+- a microservices deployment template
+- a frontend/UI starter
+
+The goal is to provide a reliable backend foundation that teams can extend safely.
+
+---
+
+## Current State
+
+As of the current baseline, this template includes:
+
+- Java 21 + Quarkus 3.29.4 runtime
+- Clean Architecture package boundaries with application ports
+- Reactive persistence with Hibernate Reactive + PostgreSQL
+- Flyway migration baseline (`V1__init_schema.sql`)
+- Structured logging and audit modules (in-process)
+- Unit + architecture + integration test lanes
+- CLI helper scripts for onboarding and release workflows
+
+---
+
+## Architecture Overview
+
+Dependency flow:
+
+```text
+controller -> service -> domain
+                |
+                -> application.port <- infrastructure
+```
+
+Key guardrails are enforced by ArchUnit tests:
+
+- `service` must not depend on `controller` or `infrastructure`
+- `controller` must not depend on `infrastructure` or `application.port`
+- `domain` must not depend on outer layers
+- ports under `application.port` must be interfaces
+
+---
+
+## Project Structure
 
 ```text
 .
@@ -41,10 +106,27 @@ Production-oriented template for building a reactive modular monolith on Quarkus
 │   └── src/test
 ├── docker/postgres/init
 ├── docs
+├── tools
 └── .github/workflows
 ```
 
-## Quick start
+---
+
+## API Surface
+
+- Products: `/api/v1/products`
+- Categories: `/api/v1/categories`
+- Audit logs: `/api/v1/audit`
+- Access logs: `/api/v1/logs/access`
+- Application logs: `/api/v1/logs/application`
+- Error logs: `/api/v1/logs/error`
+- Performance logs: `/api/v1/logs/performance`
+- OpenAPI: `/q/openapi`
+- Swagger UI: `/q/swagger-ui`
+
+---
+
+## Quick Start
 
 Prerequisites:
 
@@ -57,7 +139,7 @@ Prerequisites:
 docker compose up -d
 ```
 
-Or:
+or
 
 ```bash
 podman compose up -d
@@ -69,18 +151,14 @@ podman compose up -d
 ./gradlew :app:quarkusDev
 ```
 
-3. Open API docs:
+3. Open docs:
 
-- Swagger UI: `http://localhost:8080/q/swagger-ui`
-- OpenAPI: `http://localhost:8080/q/openapi`
+- `http://localhost:8080/q/swagger-ui`
+- `http://localhost:8080/q/openapi`
 
-## Build and test
+---
 
-Build:
-
-```bash
-./gradlew :app:build
-```
+## Testing
 
 Unit + architecture tests:
 
@@ -88,7 +166,7 @@ Unit + architecture tests:
 ./gradlew :app:test
 ```
 
-Integration tests (opt-in):
+Integration tests:
 
 ```bash
 RUN_DB_INTEGRATION_TESTS=true ./gradlew :app:integrationTest
@@ -100,13 +178,14 @@ PowerShell:
 $env:RUN_DB_INTEGRATION_TESTS="true"; ./gradlew :app:integrationTest
 ```
 
-Notes:
+Current examples:
 
-- `test` task excludes `@Tag("integration")`.
-- `integrationTest` task includes only `@Tag("integration")`.
-- Integration test task forces Flyway migrate/clean at start to keep DB state deterministic.
+- Unit/architecture: `QueryAccessLogsUseCaseTest`, `ArchitectureRulesTest`
+- Integration: `ProductApiIntegrationTest`, `CategoryApiIntegrationTest`
 
-## CLI helpers
+---
+
+## CLI Helpers
 
 PowerShell:
 
@@ -130,82 +209,62 @@ Bash:
 ./tools/template.sh release 1.1.0-SNAPSHOT --tag
 ```
 
-See `docs/TEMPLATE_CLI.md` for all commands.
+For full command details: `docs/TEMPLATE_CLI.md`
 
-## Runtime configuration
+---
 
-Main config file: `app/src/main/resources/application.yml`
-
-Profiles:
-
-- `dev`: local defaults (`postgres/postgres`, DB `cleanslice_platform`)
-- `test`: DB `cleanslice_platform_test`, Flyway migrate+clean on start
-- `prod`: env-driven credentials and URLs, schema validation mode
-
-Template env vars are listed in `.env.example`.
-
-## Database and migrations
-
-- Migration folder: `app/src/main/resources/db/migration`
-- Baseline migration: `V1__init_schema.sql`
-- Compose init script creates test DB on first container init:
-  - `cleanslice_platform`
-  - `cleanslice_platform_test`
-
-If your existing DB volume was created with different credentials, reset/recreate the volume before first template run.
-
-## CI pipeline
+## CI Pipeline
 
 Workflow: `.github/workflows/ci.yml`
 
-- `dependency-review` job (PR only): checks vulnerable/new risky dependencies
-- `test` job: runs `:app:test`
-- `integration-test` job: starts PostgreSQL service and runs `:app:integrationTest`
+- `dependency-review` job on pull requests
+- `test` job for `:app:test`
+- `integration-test` job for `:app:integrationTest` with PostgreSQL service
 
-## Architecture guardrails
+---
 
-Enforced by `ArchitectureRulesTest`:
+## Runtime Configuration
 
-- `service` must not depend on `controller` or `infrastructure`
-- `controller` must not depend on `infrastructure` or `application.port`
-- `domain` must not depend on outer layers
-- port packages must contain interfaces
+Main config: `app/src/main/resources/application.yml`
 
-See `docs/CLEAN_ARCHITECTURE.md` for rules and conventions.
+Profiles:
 
-## Logging and observability
+- `dev`: local defaults (`postgres/postgres`, `cleanslice_platform`)
+- `test`: isolated test DB (`cleanslice_platform_test`) with Flyway migrate/clean strategy
+- `prod`: env-driven credentials/URLs with validate strategy
 
-- Access logs via HTTP filter
-- Error logging via global exception flow
-- Performance logging via DB operation wrappers
-- Audit event pipeline via in-process port/adapter
+Environment template: `.env.example`
 
-See:
+---
 
-- `docs/LOGGING_SYSTEM.md`
-- `docs/AUTO_LOGGING_GUIDE.md`
-- `docs/AUDIT_LOGGING_GUIDE.md`
+## Migrations And Database
 
-## API groups
+- Migration path: `app/src/main/resources/db/migration`
+- Baseline: `V1__init_schema.sql`
+- Compose init script creates test DB on first bootstrap:
+  - `cleanslice_platform`
+  - `cleanslice_platform_test`
 
-- Products: `/api/v1/products`
-- Categories: `/api/v1/categories`
-- Audit: `/api/v1/audit`
-- Access logs: `/api/v1/logs/access`
-- Application logs: `/api/v1/logs/application`
-- Error logs: `/api/v1/logs/error`
-- Performance logs: `/api/v1/logs/performance`
+If using an old persistent DB volume with different credentials/state, recreate volume before first run.
 
-## Test examples
+---
 
-- Unit/architecture: `QueryAccessLogsUseCaseTest`, `ArchitectureRulesTest`
-- Integration: `ProductApiIntegrationTest`, `CategoryApiIntegrationTest`
+## Extending The Template
 
-## Template customization checklist
+Recommended flow for a new module:
 
-See detailed checklist: `docs/TEMPLATE_CUSTOMIZATION.md`
+1. add domain model in `domain`
+2. define ports in `application/port/out/*` and `application/port/in/*` when needed
+3. implement use cases in `service`
+4. implement adapters in `infrastructure`
+5. expose API in `controller`
+6. add unit + integration coverage
 
-## Documentation index
+Detailed checklist: `docs/TEMPLATE_CUSTOMIZATION.md`
+
+---
+
+## Documentation Index
 
 - `docs/CLEAN_ARCHITECTURE.md`
 - `docs/LOGGING_SYSTEM.md`
