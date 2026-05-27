@@ -4,25 +4,27 @@ services:
   # Single PostgreSQL for monolith
   postgres:
     image: postgres:16
-    container_name: postgresql
+    container_name: ${POSTGRES_CONTAINER_NAME:-cleanslice-postgres}
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: 123456
-      POSTGRES_DB: clean-architechture
+      POSTGRES_USER: ${DB_USERNAME:-postgres}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-postgres}
+      POSTGRES_DB: ${POSTGRES_DB:-cleanslice_platform}
+      POSTGRES_TEST_DB: ${POSTGRES_TEST_DB:-cleanslice_platform_test}
     ports:
-      - "5432:5432"
+      - "${POSTGRES_PORT:-5432}:5432"
     volumes:
       - postgres-data:/var/lib/postgresql/data
+      - ./docker/postgres/init:/docker-entrypoint-initdb.d:ro
     networks:
-      - honeybee-network
+      - cleanslice-network
     healthcheck:
-      test: ["CMD", "pg_isready", "-U", "postgres"]
+      test: ["CMD", "pg_isready", "-U", "${DB_USERNAME:-postgres}"]
       interval: 10s
       timeout: 5s
       retries: 5
 
 networks:
-  honeybee-network:
+  cleanslice-network:
     driver: bridge
 
 volumes:

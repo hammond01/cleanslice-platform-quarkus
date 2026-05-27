@@ -1,7 +1,7 @@
 package io.cleanslice.platform.infrastructure.persistence;
 
-import io.cleanslice.platform.domain.BaseEntity;
 import io.cleanslice.platform.common.context.UserContext;
+import io.cleanslice.platform.infrastructure.persistence.entity.BaseEntityJpa;
 import io.quarkus.arc.Arc;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
@@ -19,7 +19,7 @@ public class AuditingEntityListener {
     UserContext userContext;
 
     @PrePersist
-    public void setCreatedBy(BaseEntity entity) {
+    public void setCreatedBy(BaseEntityJpa entity) {
         String currentUser = getCurrentUser();
         if (entity.createdBy == null) {
             entity.createdBy = currentUser;
@@ -27,7 +27,7 @@ public class AuditingEntityListener {
     }
 
     @PreUpdate
-    public void setLastModifiedBy(BaseEntity entity) {
+    public void setLastModifiedBy(BaseEntityJpa entity) {
         entity.lastModifiedBy = getCurrentUser();
     }
 
